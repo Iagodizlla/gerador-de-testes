@@ -1,3 +1,7 @@
+using Gerador_de_testesWebApp.DependencyInjection;
+using Gerador_de_testesWebApp.Orm;
+using Serilog;
+
 namespace Gerador_de_testesWebApp
 {
     public class Program
