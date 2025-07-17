@@ -1,4 +1,4 @@
-﻿namespace eAgenda.WebApp.Models;
+﻿namespace Gerador_de_testes.WebApp.Models;
 
 public class ErrorViewModel
 {

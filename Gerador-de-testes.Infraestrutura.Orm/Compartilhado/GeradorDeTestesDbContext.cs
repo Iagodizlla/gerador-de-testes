@@ -1,24 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Gerador_de_testes.ModuloDisciplina;
+using Microsoft.EntityFrameworkCore;
 
-namespace Gerador_de_testes.Infraestrutura.Orm.Compartilhado
+namespace Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
+
+public class GeradorDeTestesDbContext : DbContext
 {
-    public class GeradorDeTestesDbContext : DbContext
+    public DbSet<Disciplina> Disciplinas { get; set; }
+    public GeradorDeTestesDbContext(DbContextOptions options) : base(options) { }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        public GeradorDeTestesDbContext(DbContextOptions options) : base(options) { }
+        var assembly = typeof(GeradorDeTestesDbContext).Assembly;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            var assembly = typeof(GeradorDeTestesDbContext).Assembly;
+        modelBuilder.ApplyConfigurationsFromAssembly(assembly);
 
-            modelBuilder.ApplyConfigurationsFromAssembly(assembly);
-
-            base.OnModelCreating(modelBuilder);
-        }
+        base.OnModelCreating(modelBuilder);
     }
 }

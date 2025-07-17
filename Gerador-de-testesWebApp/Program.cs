@@ -1,9 +1,9 @@
 using Gerador_de_testes.Infraestrutura.Orm.ModuloDisciplina;
 using Gerador_de_testes.ModuloDisciplina;
-using Gerador_de_testesWebApp.DependencyInjection;
-using Gerador_de_testesWebApp.Orm;
+using Gerador_de_testes.WebApp.DependencyInjection;
+using Gerador_de_testes.WebApp.Orm;
 
-namespace Gerador_de_testesWebApp;
+namespace Gerador_de_testes.WebApp;
 
 public class Program
 {
