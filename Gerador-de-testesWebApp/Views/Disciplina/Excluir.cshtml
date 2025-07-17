@@ -1,35 +1,31 @@
-﻿﻿@{
-Layout = "_Layout";
-ViewBag.Titulo = "Visualização de Disciplinas";
+﻿﻿@using static Gerador_de_testes.WebApp.Models.FormularioDisciplinaViewModel
+@model ExcluirDisciplinaViewModel
+
+@{
+    Layout = "_Layout";
+    ViewBag.Titulo = "Exclusão de Disciplina";
 }
 
-<p>
-    <a class="btn btn-primary px-4" href="/disciplinas/cadastrar">
-        <i class="bi bi-plus"></i>
-        Cadastrar Novo/a
-    </a>
-</p>
-
 <hr />
+<div class="row justify-content-center my-5">
+    <div class="col-md-8">
+        <div class="card rounded-4 border-0">
+            <div class="card-body p-md-5">
+                <h3>Formulário de Exclusão</h3>
 
-<div class="d-flex flex-wrap gap-2">
-    @foreach (var item in Model.Registros)
-    {
-        <div class="col-12 col-md-3">
-            <div class="card border-0">
-                <div class="card-body">
-                    <h5 class="card-title">Categoria: @item.Nome</h5>
-
-                    <span class="d-flex justify-content-end mt-4 gap-1">
-                        <a href="/disciplinas/editar/@item.Id" class="btn btn-primary rounded-circle opcao-card">
-                            <i class="bi bi-pencil-square"></i>
-                        </a>
-                        <a href="/disciplinas/excluir/@item.Id" class="btn btn-danger rounded-circle opcao-card">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </span>
-                </div>
+                <p class="mt-4">Você deseja realmente excluir a Disciplina "@Model.Nome"?</p>
+                <form action="/disciplinas/excluir/@Model.Id" method="post">
+                    <input name="Titulo" type="hidden" value="@Model.Nome" />
+                    <input name="Id" type="hidden" value="@Model.Id" />
+                    <div class="form-group d-flex align-items-center justify-content-end gap-3">
+                        <a href="/disciplinas">Voltar para a listagem</a>
+                        <button type="submit" class="btn btn-primary rounded-3 px-5">Confirmar</button>
+                    </div>
+                </form>
             </div>
         </div>
-    }
+    </div>
 </div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
