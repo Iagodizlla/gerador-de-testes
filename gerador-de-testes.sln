@@ -1,15 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36310.24 d17.14
+VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gerador-de-testesWebApp", "Gerador-de-testesWebApp\Gerador-de-testesWebApp.csproj", "{240DB9D3-0EA9-4C71-B729-F84202FE5717}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.Apresentação", "1.Apresentação", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1", "1", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.Dominio", "2.Dominio", "{E9E0A3BD-332E-4115-82C4-14DB02801864}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2", "2", "{E9E0A3BD-332E-4115-82C4-14DB02801864}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.Infraestrutura", "3.Infraestrutura", "{BB589B0E-AAC1-4136-9258-49F2CD39E8D5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3", "3", "{BB589B0E-AAC1-4136-9258-49F2CD39E8D5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gerador-de-testes.Dominio", "Gerador-de-testes\Gerador-de-testes.Dominio.csproj", "{3F57FA91-67B7-4373-AA6D-BDD1C84BFD38}"
 EndProject
