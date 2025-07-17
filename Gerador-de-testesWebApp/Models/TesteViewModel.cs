@@ -1,0 +1,127 @@
+﻿using Gerador_de_testes.ModuloDeTestes;
+using Gerador_de_testes.ModuloDisciplina;
+using Gerador_de_testesWebApp.Extensions;
+using System.ComponentModel.DataAnnotations;
+
+namespace Gerador_de_testesWebApp.Models
+{
+    public class FormularioTesteViewModel
+    {
+        [Required(ErrorMessage = "O campo \"Título\" é obrigatório.")]
+        [StringLength(100, ErrorMessage = "O título deve ter no máximo 100 caracteres.")]
+        public string Titulo { get; set; }
+
+        [Required(ErrorMessage = "O campo \"Disciplina\" é obrigatório.")]
+        public Disciplina Disciplina { get; set; }
+
+        [Required(ErrorMessage = "O campo \"Série\" é obrigatório.")]
+        [StringLength(50, ErrorMessage = "A série deve ter no máximo 50 caracteres.")]
+        public string Serie { get; set; }
+
+        // Aguardando a implementação de Materias
+        // [Required(ErrorMessage = "O campo \"Matérias\" é obrigatório.")]
+        // [MinLength(1, ErrorMessage = "É necessário selecionar pelo menos uma matéria.")]
+        // public List<Materias> Materias { get; set; }  Aguardando a implementação de Materias
+
+        [Required(ErrorMessage = "O campo \"Quantidade de Questões\" é obrigatório.")]
+        [Range(1, int.MaxValue, ErrorMessage = "A quantidade de questões deve ser pelo menos 1.")]
+        public int QteQuestoes { get; set; }
+    }
+
+    public class CadastrarTesteViewModel : FormularioTesteViewModel
+    {
+        public CadastrarTesteViewModel()
+        {
+            Disciplina = new Disciplina();
+
+            // Aguardando a implementação de Materias
+            // Materias = new List<Materias>();
+        }
+
+        public CadastrarTesteViewModel(string titulo, Disciplina disciplina, string serie, /*List<Materias> materias,*/ int qteQuestoes) : this()
+        {
+            Titulo = titulo;
+            Disciplina = disciplina;
+            Serie = serie;
+            // Aguardando a implementação de Materias
+            // Materias = materias;
+            QteQuestoes = qteQuestoes;
+        }
+
+    }
+
+    public class EditarTesteViewModel : FormularioTesteViewModel
+    {
+        public Guid Id { get; set; }
+        public EditarTesteViewModel() { }
+        public EditarTesteViewModel(Guid id, string titulo, Disciplina disciplina, string serie, /*List<Materias> materias,*/ int qteQuestoes) : this()
+        {
+            Id = id;
+            Titulo = titulo;
+            Disciplina = disciplina;
+            Serie = serie;
+            // Aguardando a implementação de Materias
+            // Materias = materias;
+            QteQuestoes = qteQuestoes;
+        }
+    }
+
+
+    public class ExcluirTesteViewModel
+    {
+        public Guid Id { get; set; }
+        public string Titulo { get; set; }
+        public Disciplina Disciplina { get; set; }
+        public string Serie { get; set; }
+        // Aguardando a implementação de Materias
+        // public List<Materias> Materias { get; set; }  Aguardando a implementação de Materias
+        public int QteQuestoes { get; set; }
+        public ExcluirTesteViewModel() { }
+        public ExcluirTesteViewModel(Teste teste)
+        {
+            Id = teste.Id;
+            Titulo = teste.Titulo;
+            Disciplina = teste.Disciplina;
+            Serie = teste.Serie;
+            // Aguardando a implementação de Materias
+            // Materias = teste.Materias;
+            QteQuestoes = teste.QteQuestoes;
+        }
+    }
+
+    public class VisualizarTesteViewModel
+    {
+        public List<DetalhesTesteViewModel> Registros { get; set; }
+
+        public VisualizarTesteViewModel(List<Teste> compromissos)
+        {
+            Registros = new List<DetalhesTesteViewModel>();
+
+            foreach (var c in compromissos)
+                Registros.Add(c.ParaDetalhesVM());
+        }
+    }
+
+    public class DetalhesTesteViewModel
+    {
+        public string Id { get; set; }
+        public string Titulo { get; set; }
+        public string Disciplina { get; set; }
+        public string Serie { get; set; }
+        // Aguardando a implementação de Materias
+        // public string Materias { get; set; }  Aguardando a implementação de Materias
+        public int QteQuestoes { get; set; }
+        public DetalhesTesteViewModel() { }
+
+        public DetalhesTesteViewModel(Teste teste)
+        {
+            Id = teste.Id.ToString();
+            Titulo = teste.Titulo;
+            Disciplina = teste.Disciplina.Nome;
+            Serie = teste.Serie;
+            // Aguardando a implementação de Materias
+            // Materias = string.Join(", ", teste.Materias.Select(m => m.Nome));
+            QteQuestoes = teste.QteQuestoes;
+        }
+    }
+}
