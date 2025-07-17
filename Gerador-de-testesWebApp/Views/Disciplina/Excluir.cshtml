@@ -14,12 +14,11 @@
                 <h3>Formulário de Exclusão</h3>
 
                 <p class="mt-4">Você deseja realmente excluir a Disciplina "@Model.Nome"?</p>
-                <form action="/disciplinas/excluir/@Model.Id" method="post">
-                    <input name="Titulo" type="hidden" value="@Model.Nome" />
-                    <input name="Id" type="hidden" value="@Model.Id" />
+                
+                <form asp-action="Excluir" asp-route-id="@Model.Id">
                     <div class="form-group d-flex align-items-center justify-content-end gap-3">
                         <a href="/disciplinas">Voltar para a listagem</a>
-                        <button type="submit" class="btn btn-primary rounded-3 px-5">Confirmar</button>
+                        <button type="submit" class="btn btn-danger px-5">Confirmar</button>
                     </div>
                 </form>
             </div>
