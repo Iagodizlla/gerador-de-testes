@@ -11,13 +11,15 @@ namespace Gerador_de_testes.ModuloQuestao
     {
         public Guid Id { get; set; }
         public string Resposta { get; set; }
+        public Questao Questao { get; set; }
         public bool Correta { get; set; }
         public Alternativa() { }
-        public Alternativa(string resposta, bool correta)
+        public Alternativa(string resposta, bool correta, Questao questao)
         {
             Id = Guid.NewGuid();
             Resposta = resposta;
             Correta = correta;
+            Questao = questao;
         }
 
 
