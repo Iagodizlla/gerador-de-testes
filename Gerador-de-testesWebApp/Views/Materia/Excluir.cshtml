@@ -1,9 +1,9 @@
-﻿﻿@using static Gerador_de_testes.WebApp.Models.FormularioDisciplinaViewModel
-@model ExcluirDisciplinaViewModel
+﻿﻿@using static Gerador_de_testes.WebApp.Models.FormularioMateriaViewModel
+@model ExcluirMateriaViewModel
 
 @{
     Layout = "_Layout";
-    ViewBag.Titulo = "Exclusão de Disciplina";
+    ViewBag.Titulo = "Exclusão de Materia";
 }
 
 <hr />
@@ -13,11 +13,11 @@
             <div class="card-body p-md-5">
                 <h3>Formulário de Exclusão</h3>
 
-                <p class="mt-4">Você deseja realmente excluir a Disciplina "@Model.Nome"?</p>
+                <p class="mt-4">Você deseja realmente excluir a Materia "@Model.Nome"?</p>
                 
                 <form asp-action="Excluir" asp-route-id="@Model.Id">
                     <div class="form-group d-flex align-items-center justify-content-end gap-3">
-                        <a href="/disciplinas">Voltar para a listagem</a>
+                        <a href="/materias">Voltar para a listagem</a>
                         <button type="submit" class="btn btn-danger px-5">Confirmar</button>
                     </div>
                 </form>

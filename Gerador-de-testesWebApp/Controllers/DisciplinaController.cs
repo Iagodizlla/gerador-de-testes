@@ -150,7 +150,6 @@ public class DisciplinaController : Controller
         }
         catch (Exception)
         {
-
             transacao.Rollback();
 
             throw;

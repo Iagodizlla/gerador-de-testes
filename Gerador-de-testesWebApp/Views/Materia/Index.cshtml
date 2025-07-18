@@ -1,10 +1,10 @@
 ﻿﻿@{
 Layout = "_Layout";
-ViewBag.Titulo = "Visualização de Disciplinas";
+ViewBag.Titulo = "Visualização de Materias";
 }
 
 <p>
-    <a class="btn btn-primary px-4" href="/disciplinas/cadastrar">
+    <a class="btn btn-primary px-4" href="/materias/cadastrar">
         <i class="bi bi-plus"></i>
         Cadastrar Novo/a
     </a>
@@ -18,13 +18,15 @@ ViewBag.Titulo = "Visualização de Disciplinas";
         <div class="col-12 col-md-3">
             <div class="card border-0">
                 <div class="card-body">
-                    <h5 class="card-title">Categoria: @item.Nome</h5>
+                    <h5 class="card-title">Nome: @item.Nome</h5>
+                    <h5 class="card-title">Serie: @item.Serie</h5>
+                    <h5 class="card-text">Disciplina: @item.Disciplina.Nome</h5>
 
                     <span class="d-flex justify-content-end mt-4 gap-1">
-                        <a href="/disciplinas/editar/@item.Id" class="btn btn-primary rounded-circle opcao-card">
+                        <a href="/materias/editar/@item.Id" class="btn btn-primary rounded-circle opcao-card">
                             <i class="bi bi-pencil-square"></i>
                         </a>
-                        <a href="/disciplinas/excluir/@item.Id" class="btn btn-danger rounded-circle opcao-card">
+                        <a href="/materias/excluir/@item.Id" class="btn btn-danger rounded-circle opcao-card">
                             <i class="bi bi-trash"></i>
                         </a>
                     </span>

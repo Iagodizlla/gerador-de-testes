@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace eAgenda.WebApp.Controllers;
+namespace Gerador_de_testes.WebApp.Controllers;
 
 public class HomeController : Controller
 {
