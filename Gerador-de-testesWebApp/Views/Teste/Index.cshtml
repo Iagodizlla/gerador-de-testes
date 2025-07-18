@@ -1,0 +1,38 @@
+﻿@{
+    Layout = "_Layout";
+    ViewBag.Titulo = "Visualização de Testes";
+}
+
+<p>
+    <a class="btn btn-primary px-4" href="/testes/cadastrar">
+        <i class="bi bi-plus"></i>
+        Cadastrar Novo/a
+    </a>
+</p>
+
+<hr />
+
+<div class="d-flex flex-wrap gap-2">
+    @foreach (var item in Model.Registros)
+    {
+        <div class="col-12 col-md-3">
+            <div class="card border-0">
+                <div class="card-body">
+                    <h5 class="card-title">@item.Titulo</h5>
+                    <p class="card-text">
+                        Matéria: @item.Materia <br />
+                        Criado em: @item.DataCriacao.ToString("dd/MM/yyyy")
+                    </p>
+                    <span class="d-flex justify-content-end mt-4 gap-1">
+                        <a href="/testes/editar/@item.Id" class="btn btn-primary rounded-circle opcao-card">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a href="/testes/excluir/@item.Id" class="btn btn-danger rounded-circle opcao-card">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+</div>

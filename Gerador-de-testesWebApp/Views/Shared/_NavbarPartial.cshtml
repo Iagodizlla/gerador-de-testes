@@ -1,6 +1,7 @@
 ﻿@{
     var rotaDisciplinaAtiva = ViewContext.HttpContext.Request.Path.StartsWithSegments("/disciplinas") ? "nav-link active btn btn-primary px-3 text-white" : "nav-link text-primary fw-semibold";
     var rotaMateriaAtiva = ViewContext.HttpContext.Request.Path.StartsWithSegments("/materias") ? "nav-link active btn btn-primary px-3 text-white" : "nav-link text-primary fw-semibold";
+    var rotatestesAtiva = ViewContext.HttpContext.Request.Path.StartsWithSegments("/testes") ? "nav-link active btn btn-primary px-3 text-white" : "nav-link text-primary fw-semibold";
 }
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -14,6 +15,7 @@
             <ul class="navbar-nav ms-auto gap-2">
                 <li class="nav-item">
                     <a class="@rotaDisciplinaAtiva" href="/disciplinas">Disciplinas</a>
+                    <a class="@rotatestesAtiva" href="/testes">Testes</a>
                 </li>
                 <li class="nav-item">
                     <a class="@rotaDisciplinaAtiva" href="/materias">Materias</a>
