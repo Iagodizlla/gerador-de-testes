@@ -25,6 +25,20 @@ public class Materia : EntidadeBase<Materia>
         Serie = serie;
         Disciplina = disciplina;
     }
+
+    public void RegistrarDisciplina(Disciplina disciplina)
+    {
+        this.RemoverDisciplina();
+        Disciplina = disciplina;
+        disciplina.Materias.Add(this);
+    }
+    public void RemoverDisciplina()
+    {
+        if (Disciplina != null)
+        {
+            Disciplina.Materias.Remove(this);
+        }
+    }
     public override void AtualizarRegistro(Materia registroEditado)
     {
         Nome = registroEditado.Nome;

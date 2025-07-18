@@ -138,6 +138,14 @@ public class DisciplinaController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult ExcluirConfirmado(Guid id)
     {
+        var registroSelecionado = repositorioDisciplina.SelecionarRegistroPorId(id);
+
+        if (registroSelecionado.Materias.Count > 0)
+        {
+            ModelState.AddModelError("ExclusaoInvalida", "Não é possível excluir uma disciplina que possui matérias associadas.");
+            return RedirectToAction(nameof(Index));
+        }
+
         var transacao = contexto.Database.BeginTransaction();
 
         try

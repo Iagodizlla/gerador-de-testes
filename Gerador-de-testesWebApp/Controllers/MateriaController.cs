@@ -54,42 +54,53 @@ public class MateriaController : Controller
     {
         var contatosDisponiveis = repositorioDisciplina.SelecionarRegistros();
 
-        if (repositorioMateria.SelecionarRegistros().Any(x => x.Nome.Equals(cadastrarVM.Nome)))
-            ModelState.AddModelError("CadastroUnico", "Já existe uma materia registrada com este nome.");
+        if (repositorioMateria.SelecionarRegistros()
+            .Any(x => x.Nome.Equals(cadastrarVM.Nome, StringComparison.OrdinalIgnoreCase)))
+        {
+            ModelState.AddModelError("Nome", "Já existe uma matéria registrada com este nome.");
+        }
 
         if (!ModelState.IsValid)
         {
             foreach (var cd in contatosDisponiveis)
-            {
-                var selecionarVM = new SelectListItem(cd.Nome, cd.Id.ToString());
-
-                cadastrarVM.DisciplinasDisponiveis?.Add(selecionarVM);
-            }
+                cadastrarVM.DisciplinasDisponiveis?.Add(new SelectListItem(cd.Nome, cd.Id.ToString()));
 
             return View(cadastrarVM);
         }
 
-        var registro = cadastrarVM.ParaEntidade(contatosDisponiveis);
+        var disciplinaSelecionada = contatosDisponiveis.FirstOrDefault(d => d.Id == cadastrarVM.DisciplinaSelecionada);
+
+        if (disciplinaSelecionada is null)
+        {
+            ModelState.AddModelError("DisciplinaSelecionada", "A disciplina selecionada não foi encontrada.");
+
+            foreach (var cd in contatosDisponiveis)
+                cadastrarVM.DisciplinasDisponiveis?.Add(new SelectListItem(cd.Nome, cd.Id.ToString()));
+
+            return View(cadastrarVM);
+        }
+
+        var registro = new Materia(cadastrarVM.Nome!, cadastrarVM.Serie, disciplinaSelecionada);
+
+        registro.RegistrarDisciplina(disciplinaSelecionada);
 
         var transacao = contexto.Database.BeginTransaction();
 
         try
         {
             repositorioMateria.CadastrarRegistro(registro);
-
             contexto.SaveChanges();
-
             transacao.Commit();
         }
         catch (Exception)
         {
             transacao.Rollback();
-
             throw;
         }
 
         return RedirectToAction(nameof(Index));
     }
+
 
     [HttpGet("editar/{id:guid}")]
     public ActionResult Editar(Guid id)
@@ -116,44 +127,47 @@ public class MateriaController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Editar(Guid id, EditarMateriaViewModel editarVM)
     {
-        var contatosDisponiveis = repositorioDisciplina.SelecionarRegistros();
+        var disciplinasDisponiveis = repositorioDisciplina.SelecionarRegistros();
 
-        if (repositorioMateria.SelecionarRegistros().Any(x => x.Nome.Equals(editarVM.Nome)))
-            ModelState.AddModelError("CadastroUnico", "Já existe uma materia registrada com este nome.");
+        if (repositorioMateria.SelecionarRegistros()
+            .Any(x => x.Nome.Equals(editarVM.Nome, StringComparison.OrdinalIgnoreCase) && x.Id != id))
+        {
+            ModelState.AddModelError("Nome", "Já existe uma matéria registrada com este nome.");
+        }
 
         if (!ModelState.IsValid)
         {
-            foreach (var cd in contatosDisponiveis)
-            {
-                var selecionarVM = new SelectListItem(cd.Nome, cd.Id.ToString());
-
-                editarVM.DisciplinasDisponiveis?.Add(selecionarVM);
-            }
+            foreach (var d in disciplinasDisponiveis)
+                editarVM.DisciplinasDisponiveis?.Add(new SelectListItem(d.Nome, d.Id.ToString()));
 
             return View(editarVM);
         }
 
-        var compromissoEditado = editarVM.ParaEntidade(contatosDisponiveis);
+        var disciplinaSelecionada = disciplinasDisponiveis.FirstOrDefault(d => d.Id == editarVM.DisciplinaSelecionada);
+
+        var materiaExistente = repositorioMateria.SelecionarRegistroPorId(id);
+
+        materiaExistente.Nome = editarVM.Nome!;
+        materiaExistente.Serie = editarVM.Serie;
+        materiaExistente.RegistrarDisciplina(disciplinaSelecionada);
 
         var transacao = contexto.Database.BeginTransaction();
 
         try
         {
-            repositorioMateria.EditarRegistro(id, compromissoEditado);
-
+            repositorioMateria.EditarRegistro(id, materiaExistente);
             contexto.SaveChanges();
-
             transacao.Commit();
         }
         catch (Exception)
         {
             transacao.Rollback();
-
             throw;
         }
 
         return RedirectToAction(nameof(Index));
     }
+
 
     [HttpGet("excluir/{id:guid}")]
     public IActionResult Excluir(Guid id)
