@@ -18,7 +18,7 @@ public class FormularioMateriaViewModel
     [MaxLength(100, ErrorMessage = "O campo \"Serie\" precisa conter no máximo 50 caracteres.")]
     public string Serie { get; set; }
 
-    [Required(ErrorMessage = "O campo \"Disciplina Selecionada\" é obrigatório.")]
+    [Required(ErrorMessage = "O campo \"Disciplina\" é obrigatório.")]
     public Guid? DisciplinaSelecionada { get; set; }
     public List<SelectListItem>? DisciplinasDisponiveis { get; set; }
 }

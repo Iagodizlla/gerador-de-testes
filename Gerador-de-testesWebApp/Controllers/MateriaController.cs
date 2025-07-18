@@ -5,6 +5,7 @@ using Gerador_de_testes.WebApp.Extensions;
 using Gerador_de_testes.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Win32;
 
 namespace Gerador_de_testes.WebApp.Controllers;
 
@@ -53,6 +54,9 @@ public class MateriaController : Controller
     {
         var contatosDisponiveis = repositorioDisciplina.SelecionarRegistros();
 
+        if (repositorioMateria.SelecionarRegistros().Any(x => x.Nome.Equals(cadastrarVM.Nome)))
+            ModelState.AddModelError("CadastroUnico", "Já existe uma materia registrada com este nome.");
+
         if (!ModelState.IsValid)
         {
             foreach (var cd in contatosDisponiveis)
@@ -65,13 +69,13 @@ public class MateriaController : Controller
             return View(cadastrarVM);
         }
 
-        var despesa = cadastrarVM.ParaEntidade(contatosDisponiveis);
+        var registro = cadastrarVM.ParaEntidade(contatosDisponiveis);
 
         var transacao = contexto.Database.BeginTransaction();
 
         try
         {
-            repositorioMateria.CadastrarRegistro(despesa);
+            repositorioMateria.CadastrarRegistro(registro);
 
             contexto.SaveChanges();
 
@@ -113,6 +117,9 @@ public class MateriaController : Controller
     public ActionResult Editar(Guid id, EditarMateriaViewModel editarVM)
     {
         var contatosDisponiveis = repositorioDisciplina.SelecionarRegistros();
+
+        if (repositorioMateria.SelecionarRegistros().Any(x => x.Nome.Equals(editarVM.Nome)))
+            ModelState.AddModelError("CadastroUnico", "Já existe uma materia registrada com este nome.");
 
         if (!ModelState.IsValid)
         {
