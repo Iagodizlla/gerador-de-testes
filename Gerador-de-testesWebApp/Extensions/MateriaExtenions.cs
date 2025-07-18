@@ -1,8 +1,8 @@
-﻿using eAgenda.WebApp.Models;
-using Gerador_de_testes.ModuloDisciplina;
+﻿using Gerador_de_testes.ModuloDisciplina;
 using Gerador_de_testes.ModuloMateria;
+using Gerador_de_testes.WebApp.Models;
 
-namespace eAgenda.WebApp.Extensions;
+namespace Gerador_de_testes.WebApp.Extensions;
 
 public static class DespesaExtensions
 {

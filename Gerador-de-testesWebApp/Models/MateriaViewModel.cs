@@ -1,11 +1,10 @@
-﻿using eAgenda.WebApp.Extensions;
+﻿using Gerador_de_testes.WebApp.Extensions;
 using Gerador_de_testes.ModuloDisciplina;
 using Gerador_de_testes.ModuloMateria;
-using Gerador_de_testes.WebApp.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace eAgenda.WebApp.Models;
+namespace Gerador_de_testes.WebApp.Models;
 
 public class FormularioMateriaViewModel
 {

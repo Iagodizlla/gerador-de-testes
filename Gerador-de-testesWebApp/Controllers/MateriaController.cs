@@ -1,21 +1,21 @@
-﻿using eAgenda.WebApp.Extensions;
-using eAgenda.WebApp.Models;
-using Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
+﻿using Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
 using Gerador_de_testes.ModuloDisciplina;
 using Gerador_de_testes.ModuloMateria;
+using Gerador_de_testes.WebApp.Extensions;
+using Gerador_de_testes.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace eAgenda.WebApp.Controllers;
+namespace Gerador_de_testes.WebApp.Controllers;
 
-[Route("compromissos")]
-public class CompromissoController : Controller
+[Route("materias")]
+public class MateriaController : Controller
 {
     private readonly GeradorDeTestesDbContext contexto;
     private readonly IRepositorioMateria repositorioMateria;
     private readonly IRepositorioDisciplina repositorioDisciplina;
 
-    public CompromissoController(
+    public MateriaController(
         GeradorDeTestesDbContext contexto,
         IRepositorioMateria repositorioCompromisso,
         IRepositorioDisciplina repositorioContato
