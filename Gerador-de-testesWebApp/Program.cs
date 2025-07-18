@@ -17,7 +17,7 @@ public class Program
 
         builder.Services.AddScoped<IRepositorioDisciplina, RepositorioDisciplinaEmOrm>();
         builder.Services.AddScoped<IRepositorioMateria, RepositorioMateriaEmOrm>();
-        builder.Services.AddScoped<IRepositorioTestes, RepositorioTestesEmOrm>();
+        builder.Services.AddScoped<IRepositorioTeste, RepositorioTestesEmOrm>();
 
         builder.Services.AddEntityFrameworkConfig(builder.Configuration);
         builder.Services.AddSerilogConfig(builder.Logging);

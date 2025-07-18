@@ -8,9 +8,9 @@ namespace Gerador_de_testesWebApp.Controllers
     [Route("testes")]
     public class TesteController : Controller
     {
-        private readonly IRepositorioTestes repositorioTestes;
+        private readonly IRepositorioTeste repositorioTestes;
 
-        public TesteController(IRepositorioTestes repositorioTestes)
+        public TesteController(IRepositorioTeste repositorioTestes)
         {
             this.repositorioTestes = repositorioTestes;
         }

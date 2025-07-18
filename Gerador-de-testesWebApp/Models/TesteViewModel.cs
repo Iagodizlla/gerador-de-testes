@@ -75,12 +75,7 @@ namespace Gerador_de_testesWebApp.Models
         public ExcluirTesteViewModel() { }
         public ExcluirTesteViewModel(Teste teste)
         {
-            Id = teste.Id;
-            Titulo = teste.Titulo;
-            Disciplina = teste.Disciplina;
-            Serie = teste.Serie;
-            Materias = teste.Materias;
-            QteQuestoes = teste.QteQuestoes;
+
         }
     }
 
@@ -111,7 +106,7 @@ namespace Gerador_de_testesWebApp.Models
         {
             Id = teste.Id.ToString();
             Titulo = teste.Titulo;
-            Disciplina = teste.Disciplina.Nome;
+            //Disciplina = teste.Disciplina.Nome;
             Serie = teste.Serie;
             Materia = string.Join(", ", teste.Materias.Select(m => m.Nome));
             QteQuestoes = teste.QteQuestoes;

@@ -11,11 +11,6 @@ namespace Gerador_de_testesWebApp.Extensions
         {
             return new Teste
             {
-                Titulo = formularioVM.Titulo,
-                Disciplina = formularioVM.Disciplina,
-                Serie = formularioVM.Serie,
-                Materias = formularioVM.Materias,
-                QteQuestoes = formularioVM.QteQuestoes
             };
         }
 
@@ -23,12 +18,7 @@ namespace Gerador_de_testesWebApp.Extensions
         {
             return new DetalhesTesteViewModel
             {
-                Id = teste.Id.ToString(),
-                Titulo = teste.Titulo,
-                Disciplina = teste.Disciplina.ToString(),
-                Serie = teste.Serie,
-                Materia = teste.Materias.ToString(),
-                QteQuestoes = teste.QteQuestoes
+
             }; 
         }
     }

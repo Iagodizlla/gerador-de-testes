@@ -12,7 +12,7 @@ namespace Gerador_de_testes.ModuloDeTestes
     public class Teste : EntidadeBase<Teste>
     {
         public string Titulo { get; set; }
-        public Disciplina Disciplina { get; set; }
+        public List<Disciplina> Disciplina { get; set; }
         public string Serie { get; set; }
         public List<Materia> Materias { get; set; }
         public int QteQuestoes { get; set; }
@@ -20,9 +20,10 @@ namespace Gerador_de_testes.ModuloDeTestes
         public Teste()
         {
             Materias = new List<Materia>();
+            Disciplina = new List<Disciplina>();
         }
 
-        public Teste(string titulo, Disciplina disciplina, string serie, List<Materia> materias, int qteQuestoes  ) : this()
+        public Teste(string titulo, List<Disciplina> disciplina, string serie, List<Materia> materias, int qteQuestoes  ) : this()
         {
             Titulo = titulo;
             Disciplina = disciplina;

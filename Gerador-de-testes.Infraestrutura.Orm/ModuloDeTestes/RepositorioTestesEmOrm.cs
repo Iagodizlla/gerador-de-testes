@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Gerador_de_testes.Infraestrutura.Orm.ModuloDeTestes
 {
-    public class RepositorioTestesEmOrm : RepositorioBaseEmOrm<Teste>, IRepositorioTestes
+    public class RepositorioTestesEmOrm : RepositorioBaseEmOrm<Teste>, IRepositorioTeste
     {
         public RepositorioTestesEmOrm(GeradorDeTestesDbContext contexto) : base(contexto)
         {
