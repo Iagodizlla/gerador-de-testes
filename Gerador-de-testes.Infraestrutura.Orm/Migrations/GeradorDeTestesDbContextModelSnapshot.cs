@@ -22,6 +22,36 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Gerador_de_testes.ModuloDeTestes.Teste", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DisciplinaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("QteQuestoes")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<string>("Serie")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DisciplinaId");
+
+                    b.ToTable("Testes");
+                });
+
             modelBuilder.Entity("Gerador_de_testes.ModuloDisciplina.Disciplina", b =>
                 {
                     b.Property<Guid>("Id")
@@ -62,6 +92,32 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
                     b.ToTable("Materias");
                 });
 
+            modelBuilder.Entity("TesteMateria", b =>
+                {
+                    b.Property<Guid>("TesteId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("MateriaId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("TesteId", "MateriaId");
+
+                    b.HasIndex("MateriaId");
+
+                    b.ToTable("TestesMaterias", (string)null);
+                });
+
+            modelBuilder.Entity("Gerador_de_testes.ModuloDeTestes.Teste", b =>
+                {
+                    b.HasOne("Gerador_de_testes.ModuloDisciplina.Disciplina", "Disciplina")
+                        .WithMany()
+                        .HasForeignKey("DisciplinaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Disciplina");
+                });
+
             modelBuilder.Entity("Gerador_de_testes.ModuloMateria.Materia", b =>
                 {
                     b.HasOne("Gerador_de_testes.ModuloDisciplina.Disciplina", "Disciplina")
@@ -71,6 +127,21 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
                         .IsRequired();
 
                     b.Navigation("Disciplina");
+                });
+
+            modelBuilder.Entity("TesteMateria", b =>
+                {
+                    b.HasOne("Gerador_de_testes.ModuloMateria.Materia", null)
+                        .WithMany()
+                        .HasForeignKey("MateriaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Gerador_de_testes.ModuloDeTestes.Teste", null)
+                        .WithMany()
+                        .HasForeignKey("TesteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Gerador_de_testes.ModuloDisciplina.Disciplina", b =>

@@ -1,5 +1,6 @@
 ﻿using Gerador_de_testes.ModuloDeTestes;
 using Gerador_de_testes.ModuloDisciplina;
+using Gerador_de_testes.ModuloMateria;
 using Gerador_de_testesWebApp.Extensions;
 using System.ComponentModel.DataAnnotations;
 
@@ -18,10 +19,9 @@ namespace Gerador_de_testesWebApp.Models
         [StringLength(50, ErrorMessage = "A série deve ter no máximo 50 caracteres.")]
         public string Serie { get; set; }
 
-        // Aguardando a implementação de Materias
-        // [Required(ErrorMessage = "O campo \"Matérias\" é obrigatório.")]
-        // [MinLength(1, ErrorMessage = "É necessário selecionar pelo menos uma matéria.")]
-        // public List<Materias> Materias { get; set; }  Aguardando a implementação de Materias
+        [Required(ErrorMessage = "O campo \"Matérias\" é obrigatório.")]
+        [MinLength(1, ErrorMessage = "É necessário selecionar pelo menos uma matéria.")]
+         public List<Materia> Materias { get; set; }
 
         [Required(ErrorMessage = "O campo \"Quantidade de Questões\" é obrigatório.")]
         [Range(1, int.MaxValue, ErrorMessage = "A quantidade de questões deve ser pelo menos 1.")]
@@ -34,17 +34,15 @@ namespace Gerador_de_testesWebApp.Models
         {
             Disciplina = new Disciplina();
 
-            // Aguardando a implementação de Materias
-            // Materias = new List<Materias>();
+            Materias = new List<Materia>();
         }
 
-        public CadastrarTesteViewModel(string titulo, Disciplina disciplina, string serie, /*List<Materias> materias,*/ int qteQuestoes) : this()
+        public CadastrarTesteViewModel(string titulo, Disciplina disciplina, string serie, List<Materia> materias, int qteQuestoes) : this()
         {
             Titulo = titulo;
             Disciplina = disciplina;
             Serie = serie;
-            // Aguardando a implementação de Materias
-            // Materias = materias;
+            Materias = materias;
             QteQuestoes = qteQuestoes;
         }
 
@@ -54,14 +52,13 @@ namespace Gerador_de_testesWebApp.Models
     {
         public Guid Id { get; set; }
         public EditarTesteViewModel() { }
-        public EditarTesteViewModel(Guid id, string titulo, Disciplina disciplina, string serie, /*List<Materias> materias,*/ int qteQuestoes) : this()
+        public EditarTesteViewModel(Guid id, string titulo, Disciplina disciplina, string serie, List<Materia> materias, int qteQuestoes) : this()
         {
             Id = id;
             Titulo = titulo;
             Disciplina = disciplina;
             Serie = serie;
-            // Aguardando a implementação de Materias
-            // Materias = materias;
+            Materias = materias;
             QteQuestoes = qteQuestoes;
         }
     }
@@ -73,8 +70,7 @@ namespace Gerador_de_testesWebApp.Models
         public string Titulo { get; set; }
         public Disciplina Disciplina { get; set; }
         public string Serie { get; set; }
-        // Aguardando a implementação de Materias
-        // public List<Materias> Materias { get; set; }  Aguardando a implementação de Materias
+        public List<Materia> Materias { get; set; }
         public int QteQuestoes { get; set; }
         public ExcluirTesteViewModel() { }
         public ExcluirTesteViewModel(Teste teste)
@@ -83,8 +79,7 @@ namespace Gerador_de_testesWebApp.Models
             Titulo = teste.Titulo;
             Disciplina = teste.Disciplina;
             Serie = teste.Serie;
-            // Aguardando a implementação de Materias
-            // Materias = teste.Materias;
+            Materias = teste.Materias;
             QteQuestoes = teste.QteQuestoes;
         }
     }
@@ -108,8 +103,7 @@ namespace Gerador_de_testesWebApp.Models
         public string Titulo { get; set; }
         public string Disciplina { get; set; }
         public string Serie { get; set; }
-        // Aguardando a implementação de Materias
-        // public string Materias { get; set; }  Aguardando a implementação de Materias
+        public string Materia { get; set; }
         public int QteQuestoes { get; set; }
         public DetalhesTesteViewModel() { }
 
@@ -119,8 +113,7 @@ namespace Gerador_de_testesWebApp.Models
             Titulo = teste.Titulo;
             Disciplina = teste.Disciplina.Nome;
             Serie = teste.Serie;
-            // Aguardando a implementação de Materias
-            // Materias = string.Join(", ", teste.Materias.Select(m => m.Nome));
+            Materia = string.Join(", ", teste.Materias.Select(m => m.Nome));
             QteQuestoes = teste.QteQuestoes;
         }
     }

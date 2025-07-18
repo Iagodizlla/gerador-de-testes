@@ -1,5 +1,6 @@
 ﻿using Gerador_de_testes.Compartilhado;
 using Gerador_de_testes.ModuloDisciplina;
+using Gerador_de_testes.ModuloMateria;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,23 +14,20 @@ namespace Gerador_de_testes.ModuloDeTestes
         public string Titulo { get; set; }
         public Disciplina Disciplina { get; set; }
         public string Serie { get; set; }
-
-        // public List<Materias> Materias { get; set; }  Aguardando a implementação de Materias
+        public List<Materia> Materias { get; set; }
         public int QteQuestoes { get; set; }
 
         public Teste()
         {
-            // Aguardando a implementação de Materias
-            //Materias = new List<Materias>();
+            Materias = new List<Materia>();
         }
 
-        public Teste(string titulo, Disciplina disciplina, string serie, /*List<Materias> materias,*/ int qteQuestoes  ) : this()
+        public Teste(string titulo, Disciplina disciplina, string serie, List<Materia> materias, int qteQuestoes  ) : this()
         {
             Titulo = titulo;
             Disciplina = disciplina;
             Serie = serie;
-            // Aguardando a implementação de Materias
-            // Materias = materias;
+            Materias = materias;
             QteQuestoes = qteQuestoes;
         }
 
@@ -38,8 +36,7 @@ namespace Gerador_de_testes.ModuloDeTestes
             registroEditado.Titulo = Titulo;
             registroEditado.Disciplina = Disciplina;
             registroEditado.Serie = Serie;
-            // Aguardando a implementação de Materias
-            // registroEditado.Materias = Materias;
+            registroEditado.Materias = Materias;
             registroEditado.QteQuestoes = QteQuestoes;
         }
     }

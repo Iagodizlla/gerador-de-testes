@@ -9,14 +9,14 @@ namespace Gerador_de_testesWebApp.Extensions
     {
         public static Teste ParaEntidade(this FormularioTesteViewModel formularioVM)
         {
-            return new Teste(
-                formularioVM.Titulo,
-                formularioVM.Disciplina,
-                formularioVM.Serie,
-                // Aguardando a implementação de Materias
-                // formularioVM.Materias,
-                formularioVM.QteQuestoes
-                );
+            return new Teste
+            {
+                Titulo = formularioVM.Titulo,
+                Disciplina = formularioVM.Disciplina,
+                Serie = formularioVM.Serie,
+                Materias = formularioVM.Materias,
+                QteQuestoes = formularioVM.QteQuestoes
+            };
         }
 
         public static DetalhesTesteViewModel ParaDetalhesVM(this Teste teste)
@@ -27,8 +27,7 @@ namespace Gerador_de_testesWebApp.Extensions
                 Titulo = teste.Titulo,
                 Disciplina = teste.Disciplina.ToString(),
                 Serie = teste.Serie,
-                // Aguardando a implementação de Materias
-                // Materias = teste.Materias,
+                Materia = teste.Materias.ToString(),
                 QteQuestoes = teste.QteQuestoes
             }; 
         }

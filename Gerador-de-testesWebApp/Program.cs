@@ -1,5 +1,7 @@
+using Gerador_de_testes.Infraestrutura.Orm.ModuloDeTestes;
 using Gerador_de_testes.Infraestrutura.Orm.ModuloDisciplina;
 using Gerador_de_testes.Infraestrutura.Orm.ModuloMateria;
+using Gerador_de_testes.ModuloDeTestes;
 using Gerador_de_testes.ModuloDisciplina;
 using Gerador_de_testes.ModuloMateria;
 using Gerador_de_testes.WebApp.DependencyInjection;
@@ -15,6 +17,7 @@ public class Program
 
         builder.Services.AddScoped<IRepositorioDisciplina, RepositorioDisciplinaEmOrm>();
         builder.Services.AddScoped<IRepositorioMateria, RepositorioMateriaEmOrm>();
+        builder.Services.AddScoped<IRepositorioTestes, RepositorioTestesEmOrm>();
 
         builder.Services.AddEntityFrameworkConfig(builder.Configuration);
         builder.Services.AddSerilogConfig(builder.Logging);
