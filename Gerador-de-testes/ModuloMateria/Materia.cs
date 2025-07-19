@@ -24,6 +24,13 @@ public class Materia : EntidadeBase<Materia>
         Questoes = questoes;
     }
 
+    public Materia(string nome, string serie, Disciplina disciplina)
+    {
+        Nome = nome;
+        Serie = serie;
+        Disciplina = disciplina;
+    }
+
     public void RegistrarDisciplina(Disciplina disciplina)
     {
         this.RemoverDisciplina();
