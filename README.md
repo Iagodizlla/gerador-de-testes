@@ -48,7 +48,7 @@
 
 - Testes
   - Criar testes a partir de questões cadastradas
-  - Visualizar, duplicar e excluir testes
+  - Visualizar, duplicar, ver detalhes e excluir testes
   - Gerar teste em PDF com gabarito automático
 
 ---
