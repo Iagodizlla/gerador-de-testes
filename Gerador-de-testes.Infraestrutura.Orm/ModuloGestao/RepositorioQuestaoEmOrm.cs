@@ -10,22 +10,34 @@ namespace Gerador_de_testes.Infraestrutura.Orm.ModuloGestao
         private readonly DbSet<Questao> registros;
         public RepositorioQuestaoEmOrm(GeradorDeTestesDbContext contextoDados) : base(contextoDados)
         {
-            this.registros = contextoDados.Set<Questao>();
+            registros = contextoDados.Set<Questao>();
         }
 
-        public void AdicionarAlternativa(Alternativa alternativa)
+        public void AdicionarAlternativa(Alternativa alternativa, Guid IdQuestao)
         {
-            
+            var registro = SelecionarRegistroPorId(IdQuestao)!;
+            registro.Alternativas.Add(alternativa);
+        }
+        public bool AtualizarAlternativa(Alternativa alternativa, Guid IdQuestao)
+        {
+            var registro = SelecionarRegistroPorId(IdQuestao);
+            if(registro is null) return false;
+
+            registro.Alternativas.ForEach(a => a.Correta = false);
+
+            var alternativaCorreta = registro.Alternativas
+            .FirstOrDefault(a => a.Id == alternativa.Id);
+            if (alternativaCorreta is null) return false;
+            alternativaCorreta.Correta = true;
+            return true;
         }
 
-        public bool AtualizarAlternativa(Alternativa alternativaAtualizado)
+        public bool RemoverAlternativa(Alternativa alternativa, Guid IdQuestao)
         {
-            throw new NotImplementedException();
-        }
-
-        public bool RemoverAlternativa(Alternativa alternativa)
-        {
-            throw new NotImplementedException();
+            var registro = SelecionarRegistroPorId(IdQuestao)!;
+            if(registro is null) return false;
+            registro.Alternativas.Remove(alternativa);
+            return true;
         }
     }
 }
