@@ -44,16 +44,15 @@ namespace Gerador_de_testesWebApp.Extensions
 
         public static DetalhesTesteViewModel ParaDetalhesVM(this Teste teste)
         {
-            //return new DetalhesTesteViewModel(
-            //    teste.Id,
-            //    teste.Titulo,
-            //    teste.Serie,
-            //    teste.QteQuestoes,
-
-
-
-            //    );
-
+            return new DetalhesTesteViewModel(
+                teste.Id,
+                teste.Titulo,
+                teste.Serie,
+                teste.QteQuestoes,
+                teste.Disciplinas,
+                teste.Materias,
+                teste.QuestoesSelecionadas
+            );
         }
     }
 }

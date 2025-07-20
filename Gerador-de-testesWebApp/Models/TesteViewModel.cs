@@ -59,6 +59,7 @@ namespace Gerador_de_testesWebApp.Models
 
     public class EditarTesteViewModel : FormularioTesteViewModel
     {
+        Guid Id { get; set; }
         public Guid DisciplinaId { get; set; }
         public Guid MateriaId { get; set; }
 
@@ -78,7 +79,7 @@ namespace Gerador_de_testesWebApp.Models
                 List<Questao> questoesSelecionadas
                 ): this()
         {
-            id = id;
+            Id = id;
             Titulo = titulo;
             Serie = serie;
             QteQuestoes = qteQuestoes;
