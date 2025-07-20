@@ -21,7 +21,6 @@ namespace Gerador_de_testes.Infraestrutura.Orm.ModuloDeTestes
                 .HasMaxLength(50)
                 .IsRequired();
 
-            // Ajuste: Relacionamento correto com Materia
             builder.HasMany(x => x.Materias)
                 .WithMany();
 

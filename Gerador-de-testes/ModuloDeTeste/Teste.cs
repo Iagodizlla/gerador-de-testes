@@ -13,7 +13,7 @@ namespace Gerador_de_testes.ModuloDeTestes
     public class Teste : EntidadeBase<Teste>
     {
         public string Titulo { get; set; }
-        public List<Disciplina> Disciplina { get; set; }
+        public List<Disciplina> Disciplinas { get; set; }
         public List<Questao> QuestoesSelecionadas { get; set; }
         public string Serie { get; set; }
         public List<Materia> Materias { get; set; }
@@ -22,14 +22,14 @@ namespace Gerador_de_testes.ModuloDeTestes
         public Teste()
         {
             Materias = new List<Materia>();
-            Disciplina = new List<Disciplina>();
+            Disciplinas = new List<Disciplina>();
             QuestoesSelecionadas = new List<Questao>();
         }
 
         public Teste(string titulo, List<Disciplina> disciplina, string serie, List<Materia> materias, int qteQuestoes, List<Questao> questoesSelecionadas) : this()
         {
             Titulo = titulo;
-            Disciplina = disciplina;
+            Disciplinas = disciplina;
             Serie = serie;
             Materias = materias;
             QteQuestoes = qteQuestoes;
@@ -39,7 +39,7 @@ namespace Gerador_de_testes.ModuloDeTestes
         public override void AtualizarRegistro(Teste registroEditado)
         {
             registroEditado.Titulo = Titulo;
-            registroEditado.Disciplina = Disciplina;
+            registroEditado.Disciplinas = Disciplinas;
             registroEditado.Serie = Serie;
             registroEditado.Materias = Materias;
             registroEditado.QteQuestoes = QteQuestoes;
