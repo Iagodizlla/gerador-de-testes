@@ -51,6 +51,31 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
                 name: "IX_MateriaTeste_TesteId",
                 table: "MateriaTeste",
                 column: "TesteId");
+
+            migrationBuilder.CreateTable(
+        name: "QuestaoTeste",
+            columns: table => new
+            {
+                TestesId = table.Column<Guid>(type: "uuid", nullable: false),
+                QuestoesId = table.Column<Guid>(type: "uuid", nullable: false)
+            },
+            constraints: table =>
+            {
+                table.PrimaryKey("PK_QuestaoTeste", x => new { x.TestesId, x.QuestoesId });
+                table.ForeignKey(
+                name: "FK_QuestaoTeste_Testes_TestesId",
+                column: x => x.TestesId,
+                principalTable: "Testes",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+                table.ForeignKey(
+                name: "FK_QuestaoTeste_Questoes_QuestoesId",
+                column: x => x.QuestoesId,
+                principalTable: "Questoes",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+    }       );
+
         }
 
         /// <inheritdoc />
@@ -58,6 +83,8 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
         {
             migrationBuilder.DropTable(
                 name: "MateriaTeste");
+            migrationBuilder.DropTable(
+                name: "QuestaoTeste");
 
             migrationBuilder.AlterColumn<int>(
                 name: "QteQuestoes",

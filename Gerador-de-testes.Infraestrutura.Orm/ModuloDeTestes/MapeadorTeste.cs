@@ -24,7 +24,10 @@ namespace Gerador_de_testes.Infraestrutura.Orm.ModuloDeTestes
             // Ajuste: Relacionamento correto com Materia
             builder.HasMany(x => x.Materias)
                 .WithMany();
-          
+
+            builder.HasMany(x => x.QuestoesSelecionadas)
+                .WithMany();
+
             builder.Property(x => x.QteQuestoes)
                 .IsRequired();
         }

@@ -2,7 +2,6 @@
 using Gerador_de_testes.ModuloQuestao;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Gerador_de_testes.Infraestrutura.Orm.ModuloGestao
 {
     public class RepositorioQuestaoEmOrm : RepositorioBaseEmOrm<Questao>, IRepositorioQuestao
@@ -18,9 +17,9 @@ namespace Gerador_de_testes.Infraestrutura.Orm.ModuloGestao
             var registro = SelecionarRegistroPorId(IdQuestao)!;
             registro.Alternativas.Add(alternativa);
         }
-        public bool AtualizarAlternativa(Alternativa alternativa, Guid IdQuestao)
+        public bool AtualizarAlternativa(Alternativa alternativa)
         {
-            var registro = SelecionarRegistroPorId(IdQuestao);
+            var registro = alternativa.Questao;
             if(registro is null) return false;
 
             registro.Alternativas.ForEach(a => a.Correta = false);
@@ -32,12 +31,29 @@ namespace Gerador_de_testes.Infraestrutura.Orm.ModuloGestao
             return true;
         }
 
-        public bool RemoverAlternativa(Alternativa alternativa, Guid IdQuestao)
+        public bool RemoverAlternativa(Alternativa alternativa)
         {
-            var registro = SelecionarRegistroPorId(IdQuestao)!;
-            if(registro is null) return false;
+            var registro = alternativa.Questao;
             registro.Alternativas.Remove(alternativa);
             return true;
+        }
+
+        public Alternativa SelecionarAlternativa(Guid idAlternativa)
+        {
+            foreach (var questoes in SelecionarRegistros())
+            {
+                foreach(var alternativa in questoes.Alternativas)
+                {
+                    if(alternativa.Id == idAlternativa)
+                        return alternativa;
+                }
+            }
+            return null;
+        }
+
+        public List<Alternativa> SelecionarTodasAlternativasDaQuestao(Questao questao)
+        {
+            return questao.Alternativas;
         }
     }
 }

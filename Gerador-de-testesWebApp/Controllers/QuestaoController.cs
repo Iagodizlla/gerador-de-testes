@@ -121,14 +121,122 @@ namespace Gerador_de_testesWebApp.Controllers
         public IActionResult ExcluirConfirmado(Guid id)
         {
             var registroSelecionado = repositorioQuestao.SelecionarRegistroPorId(id);
-            var registrosTeste = repositorioTeste.SelecionarRegistroPorId()
-            if()
+            var registrosTeste = repositorioTeste.SelecionarRegistros();
+            foreach (var registro in registrosTeste)
+            {
+                foreach (var item in registro.QuestoesSelecionadas)
+                {
+                    if (item.Id == id)
+                    {
+                        ModelState.AddModelError("ExclusaoInvalida", "Não é possível excluir uma questão que possui testes associados.");
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
 
             var transacao = contexto.Database.BeginTransaction();
 
             try
             {
-                repositorioDisciplina.ExcluirRegistro(id);
+                repositorioQuestao.ExcluirRegistro(id);
+
+                contexto.SaveChanges();
+
+                transacao.Commit();
+            }
+            catch (Exception)
+            {
+                transacao.Rollback();
+
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpGet("cadastrarAlternativa")]
+        public IActionResult CadastrarAlternativa(Guid id)
+        {
+            var registroSelecionado = repositorioQuestao.SelecionarRegistroPorId(id);
+            var cadastrarVM = new CadastrarAlternativaViewModel();
+
+            return View(cadastrarVM);
+        }
+
+        [HttpPost("cadastrarAlternativa")]
+        [ValidateAntiForgeryToken]
+        public IActionResult CadastrarAlternativa(CadastrarAlternativaViewModel cadastrarVM)
+        {
+            var entidade = cadastrarVM.ParaEntidadeAlternativa();
+
+            var transacao = contexto.Database.BeginTransaction();
+
+            try
+            {
+                repositorioQuestao.AdicionarAlternativa(entidade, entidade.Questao.Id);
+
+                contexto.SaveChanges();
+
+                transacao.Commit();
+            }
+            catch (Exception)
+            {
+                transacao.Rollback();
+
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpGet("atualizarAlternativa/{id:guid}")]
+        public IActionResult AtualizarAlternativa(Guid idAlternativa)
+        {
+            var AtualizarVM = new RemoverAlternativaViewModel(idAlternativa);
+
+            return View(AtualizarVM);
+        }
+
+        [HttpPost("atualizarAlternativa/{id:guid}")]
+        [ValidateAntiForgeryToken]
+        public IActionResult AtualizarAlternativa(RemoverAlternativaViewModel AtualizarVM)
+        {
+            var registro = repositorioQuestao.SelecionarAlternativa(AtualizarVM.Id);
+            var transacao = contexto.Database.BeginTransaction();
+
+            try
+            {
+                repositorioQuestao.AtualizarAlternativa(registro);
+
+                contexto.SaveChanges();
+
+                transacao.Commit();
+            }
+            catch (Exception)
+            {
+                transacao.Rollback();
+
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpGet("removerAlternativa/{id:guid}")]
+        public IActionResult RemoverAlternativa(Guid idAlternativa)
+        {
+            var RemoverVM = new RemoverAlternativaViewModel(idAlternativa);
+
+            return View(RemoverVM);
+        }
+
+        [HttpPost("removerAlternativa/{id:guid}")]
+        [ValidateAntiForgeryToken]
+        public IActionResult RemoverAlternativa(RemoverAlternativaViewModel RemoverVM)
+        {
+            var registro = repositorioQuestao.SelecionarAlternativa(RemoverVM.Id);
+            var transacao = contexto.Database.BeginTransaction();
+
+            try
+            {
+                repositorioQuestao.RemoverAlternativa(registro);
 
                 contexto.SaveChanges();
 

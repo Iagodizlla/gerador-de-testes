@@ -1,6 +1,7 @@
 ﻿using Gerador_de_testes.ModuloDeTestes;
 using Gerador_de_testes.ModuloDisciplina;
 using Gerador_de_testes.ModuloMateria;
+using Gerador_de_testes.ModuloQuestao;
 using Gerador_de_testesWebApp.Extensions;
 using System.ComponentModel.DataAnnotations;
 
@@ -26,6 +27,7 @@ namespace Gerador_de_testesWebApp.Models
         [Required(ErrorMessage = "O campo \"Quantidade de Questões\" é obrigatório.")]
         [Range(1, int.MaxValue, ErrorMessage = "A quantidade de questões deve ser pelo menos 1.")]
         public int QteQuestoes { get; set; }
+        public List<Questao> QuestoesSelecionadas { get; set; }
     }
 
     public class CadastrarTesteViewModel : FormularioTesteViewModel
@@ -35,15 +37,18 @@ namespace Gerador_de_testesWebApp.Models
             Disciplina = new Disciplina();
 
             Materias = new List<Materia>();
+
+            QuestoesSelecionadas = new List<Questao>();
         }
 
-        public CadastrarTesteViewModel(string titulo, Disciplina disciplina, string serie, List<Materia> materias, int qteQuestoes) : this()
+        public CadastrarTesteViewModel(string titulo, Disciplina disciplina, string serie, List<Materia> materias, int qteQuestoes, List<Questao> questoesSelecionadas) : this()
         {
             Titulo = titulo;
             Disciplina = disciplina;
             Serie = serie;
             Materias = materias;
             QteQuestoes = qteQuestoes;
+            QuestoesSelecionadas = questoesSelecionadas;
         }
 
     }
@@ -52,7 +57,7 @@ namespace Gerador_de_testesWebApp.Models
     {
         public Guid Id { get; set; }
         public EditarTesteViewModel() { }
-        public EditarTesteViewModel(Guid id, string titulo, Disciplina disciplina, string serie, List<Materia> materias, int qteQuestoes) : this()
+        public EditarTesteViewModel(Guid id, string titulo, Disciplina disciplina, string serie, List<Materia> materias, int qteQuestoes, List<Questao> questoesSelecionadas) : this()
         {
             Id = id;
             Titulo = titulo;
@@ -60,6 +65,7 @@ namespace Gerador_de_testesWebApp.Models
             Serie = serie;
             Materias = materias;
             QteQuestoes = qteQuestoes;
+            QuestoesSelecionadas = questoesSelecionadas;
         }
     }
 
@@ -72,6 +78,7 @@ namespace Gerador_de_testesWebApp.Models
         public string Serie { get; set; }
         public List<Materia> Materias { get; set; }
         public int QteQuestoes { get; set; }
+        public List<Questao> QuestoesSelecionadas { get; set; }
         public ExcluirTesteViewModel() { }
         public ExcluirTesteViewModel(Teste teste)
         {
@@ -100,6 +107,7 @@ namespace Gerador_de_testesWebApp.Models
         public string Serie { get; set; }
         public string Materia { get; set; }
         public int QteQuestoes { get; set; }
+        public List<Questao> QuestoesSelecionadas { get; set; }
         public DetalhesTesteViewModel() { }
 
         public DetalhesTesteViewModel(Teste teste)
@@ -110,6 +118,7 @@ namespace Gerador_de_testesWebApp.Models
             Serie = teste.Serie;
             Materia = string.Join(", ", teste.Materias.Select(m => m.Nome));
             QteQuestoes = teste.QteQuestoes;
-        }
+            QuestoesSelecionadas = teste.QuestoesSelecionadas;
+    }
     }
 }

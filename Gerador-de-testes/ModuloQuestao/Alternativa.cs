@@ -21,12 +21,6 @@ namespace Gerador_de_testes.ModuloQuestao
             Correta = correta;
             Questao = questao;
         }
-
-
-        public void AtribuirCorreta(Questao questao)
-        {
-            Correta = true;
-        }
     }
    
 }

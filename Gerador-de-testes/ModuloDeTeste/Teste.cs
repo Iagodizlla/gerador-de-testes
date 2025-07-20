@@ -1,6 +1,7 @@
 ﻿using Gerador_de_testes.Compartilhado;
 using Gerador_de_testes.ModuloDisciplina;
 using Gerador_de_testes.ModuloMateria;
+using Gerador_de_testes.ModuloQuestao;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace Gerador_de_testes.ModuloDeTestes
     {
         public string Titulo { get; set; }
         public List<Disciplina> Disciplina { get; set; }
+        public List<Questao> QuestoesSelecionadas { get; set; }
         public string Serie { get; set; }
         public List<Materia> Materias { get; set; }
         public int QteQuestoes { get; set; }
@@ -21,15 +23,17 @@ namespace Gerador_de_testes.ModuloDeTestes
         {
             Materias = new List<Materia>();
             Disciplina = new List<Disciplina>();
+            QuestoesSelecionadas = new List<Questao>();
         }
 
-        public Teste(string titulo, List<Disciplina> disciplina, string serie, List<Materia> materias, int qteQuestoes  ) : this()
+        public Teste(string titulo, List<Disciplina> disciplina, string serie, List<Materia> materias, int qteQuestoes, List<Questao> questoesSelecionadas) : this()
         {
             Titulo = titulo;
             Disciplina = disciplina;
             Serie = serie;
             Materias = materias;
             QteQuestoes = qteQuestoes;
+            QuestoesSelecionadas = questoesSelecionadas;
         }
 
         public override void AtualizarRegistro(Teste registroEditado)
@@ -39,6 +43,7 @@ namespace Gerador_de_testes.ModuloDeTestes
             registroEditado.Serie = Serie;
             registroEditado.Materias = Materias;
             registroEditado.QteQuestoes = QteQuestoes;
+            registroEditado.QuestoesSelecionadas = QuestoesSelecionadas;
         }
     }
 }

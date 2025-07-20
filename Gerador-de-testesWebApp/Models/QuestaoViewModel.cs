@@ -99,3 +99,34 @@ namespace Gerador_de_testes.WebApp.Models;
         }
     }
 
+public class CadastrarAlternativaViewModel
+{
+    public Guid Id { get; set; }
+    public string Resposta { get; set; }
+    public Questao Questao { get; set; }
+    public bool Correta { get; set; }
+    public CadastrarAlternativaViewModel()
+    {
+        Questao = new Questao();
+    }
+    public CadastrarAlternativaViewModel(Guid id, string resposta, Questao questao, bool correta) : this()
+    {
+        Id = id;
+        Resposta = resposta;
+        Questao = questao;
+        Correta = correta;
+    }
+}
+    public class RemoverAlternativaViewModel
+    {
+        public Guid Id { get; set; }
+    public RemoverAlternativaViewModel()
+        {
+        }
+        public RemoverAlternativaViewModel(Guid id) : this()
+        {
+            Id = id;
+        }
+    }
+
+
