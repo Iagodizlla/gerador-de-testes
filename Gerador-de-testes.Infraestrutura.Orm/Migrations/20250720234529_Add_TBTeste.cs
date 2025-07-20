@@ -6,23 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
 {
     /// <inheritdoc />
-    public partial class Add_Questoes : Migration
+    public partial class Add_TBTeste : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Testes_Disciplinas_DisciplinaId",
-                table: "Testes");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Testes_DisciplinaId",
-                table: "Testes");
-
-            migrationBuilder.DropColumn(
-                name: "DisciplinaId",
-                table: "Testes");
-
             migrationBuilder.AddColumn<Guid>(
                 name: "TesteId",
                 table: "Disciplinas",
@@ -49,6 +37,20 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Testes",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Titulo = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Serie = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    QteQuestoes = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Testes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Alternativa",
                 columns: table => new
                 {
@@ -64,6 +66,30 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
                         name: "FK_Alternativa_Questoes_QuestaoId",
                         column: x => x.QuestaoId,
                         principalTable: "Questoes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MateriaTeste",
+                columns: table => new
+                {
+                    MateriasId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TesteId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MateriaTeste", x => new { x.MateriasId, x.TesteId });
+                    table.ForeignKey(
+                        name: "FK_MateriaTeste_Materias_MateriasId",
+                        column: x => x.MateriasId,
+                        principalTable: "Materias",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MateriaTeste_Testes_TesteId",
+                        column: x => x.TesteId,
+                        principalTable: "Testes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -103,6 +129,11 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
                 column: "QuestaoId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MateriaTeste_TesteId",
+                table: "MateriaTeste",
+                column: "TesteId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_QuestaoTeste_TesteId",
                 table: "QuestaoTeste",
                 column: "TesteId");
@@ -131,10 +162,16 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
                 name: "Alternativa");
 
             migrationBuilder.DropTable(
+                name: "MateriaTeste");
+
+            migrationBuilder.DropTable(
                 name: "QuestaoTeste");
 
             migrationBuilder.DropTable(
                 name: "Questoes");
+
+            migrationBuilder.DropTable(
+                name: "Testes");
 
             migrationBuilder.DropIndex(
                 name: "IX_Disciplinas_TesteId",
@@ -143,26 +180,6 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
             migrationBuilder.DropColumn(
                 name: "TesteId",
                 table: "Disciplinas");
-
-            migrationBuilder.AddColumn<Guid>(
-                name: "DisciplinaId",
-                table: "Testes",
-                type: "uuid",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Testes_DisciplinaId",
-                table: "Testes",
-                column: "DisciplinaId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Testes_Disciplinas_DisciplinaId",
-                table: "Testes",
-                column: "DisciplinaId",
-                principalTable: "Disciplinas",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
     }
 }

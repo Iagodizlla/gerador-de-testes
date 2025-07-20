@@ -166,7 +166,7 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
             modelBuilder.Entity("Gerador_de_testes.ModuloDisciplina.Disciplina", b =>
                 {
                     b.HasOne("Gerador_de_testes.ModuloDeTestes.Teste", null)
-                        .WithMany("Disciplina")
+                        .WithMany("Disciplinas")
                         .HasForeignKey("TesteId");
                 });
 
@@ -235,7 +235,7 @@ namespace Gerador_de_testes.Infraestrutura.Orm.Migrations
 
             modelBuilder.Entity("Gerador_de_testes.ModuloDeTestes.Teste", b =>
                 {
-                    b.Navigation("Disciplina");
+                    b.Navigation("Disciplinas");
                 });
 
             modelBuilder.Entity("Gerador_de_testes.ModuloDisciplina.Disciplina", b =>
