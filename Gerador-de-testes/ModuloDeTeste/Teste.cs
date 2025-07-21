@@ -12,6 +12,9 @@ namespace Gerador_de_testes.ModuloDeTestes
 {
     public class Teste : EntidadeBase<Teste>
     {
+        private Guid disciplinaId;
+        private Guid materiaId;
+
         public string Titulo { get; set; }
         public List<Disciplina> Disciplinas { get; set; }
         public List<Questao> QuestoesSelecionadas { get; set; }

@@ -33,28 +33,27 @@ namespace Gerador_de_testesWebApp.Models
 
     public class CadastrarTesteViewModel : FormularioTesteViewModel
     {
+        // Propriedades para o formulário
+        public new string Titulo { get; set; }
+        public new Guid DisciplinaId { get; set; }
+        public new Guid MateriaId { get; set; }
+        public new string Serie { get; set; }
+        public new int QteQuestoes { get; set; }
+
+        public IEnumerable<SelectListItem> DisciplinasDisponiveis { get; set; }
+        public IEnumerable<SelectListItem> MateriasDisponiveis { get; set; }
+
         public CadastrarTesteViewModel()
         {
-            Disciplinas = new List<SelectListItem>();
-            Materias = new List<SelectListItem>();
+            DisciplinasDisponiveis = new List<SelectListItem>();
+            MateriasDisponiveis = new List<SelectListItem>();
         }
 
         public CadastrarTesteViewModel(List<Disciplina> disciplinas, List<Materia> materias) : this()
         {
-            foreach(var d in disciplinas)
-            {
-                var selecionarVM = new SelectListItem(d.Nome, d.Id.ToString());
-                Disciplinas.Add(selecionarVM);
-            }
-
-            foreach (var m in materias)
-            {
-                var selecionarVM = new SelectListItem(m.Nome, m.Id.ToString());
-                Materias.Add(selecionarVM);
-            }
+            DisciplinasDisponiveis = disciplinas.Select(d => new SelectListItem(d.Nome, d.Id.ToString())).ToList();
+            MateriasDisponiveis = materias.Select(m => new SelectListItem(m.Nome, m.Id.ToString())).ToList();
         }
-
-
     }
 
     public class EditarTesteViewModel : FormularioTesteViewModel

@@ -12,29 +12,63 @@
     <div class="col-md-8">
         <div class="card rounded-4 border-0">
             <div class="card-body p-md-5">
-                <form asp-action="Cadastrar" method="post">
+                <form id="form-cadastro-teste">
                     <h3>Formulário de Cadastro</h3>
                     <div>
-                        <p class="mt-4">Preencha o campo abaixo para cadastrar um novo Teste.</p>
+                        <p class="mt-4">Preencha os campos abaixo para cadastrar um novo Teste.</p>
                     </div>
                     <div class="form-group d-grid mt-3 gap-2">
-                        <label asp-for="Titulo" class="control-label fs-5">Titulo:</label>
-                        <input asp-for="Titulo" class="form-control" value="@Model.Titulo" />
+                        <label asp-for="Titulo" class="control-label fs-5">Título:</label>
+                        <input asp-for="Titulo" class="form-control" />
                         <span asp-validation-for="Titulo" class="text-danger"></span>
-                    </div>                  
-                   @*  <div class="form-group d-grid gap-2 mt-3">
-                        <label asp-for="DisciplinaSelecionada" class="control-label fs-5">Disciplina:</label>
-                        <select asp-for="DisciplinaSelecionada" asp-items="@Model.DisciplinasDisponiveis" class="form-select">
+                    </div>
+                    
+                    <div class="form-group d-grid gap-2 mt-3">
+                        <label asp-for="DisciplinaId" class="control-label fs-5">Disciplina:</label>
+                        <select asp-for="DisciplinaId" asp-items="Model.DisciplinasDisponiveis" class="form-select">
                             <option value="">Selecione uma disciplina</option>
                         </select>
-                        <span asp-validation-for="DisciplinaSelecionada" class="text-danger"></span>
-                    </div> *@
-    
+                        <span asp-validation-for="DisciplinaId" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group d-grid gap-2 mt-3">
+                        <label asp-for="MateriaId" class="control-label fs-5">Matéria:</label>
+                        <select asp-for="MateriaId" asp-items="Model.MateriasDisponiveis" class="form-select">
+                            <option value="">Selecione uma matéria</option>
+                        </select>
+                        <span asp-validation-for="MateriaId" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group d-grid gap-2 mt-3">
+                        <label asp-for="Serie" class="control-label fs-5">Série:</label>
+                        <select asp-for="Serie" class="form-select">
+                            <option value="">Selecione a série</option>
+                            <option value="1">1ª Série</option>
+                            <option value="2">2ª Série</option>
+                        </select>
+                        <span asp-validation-for="Serie" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group d-grid gap-2 mt-3">
+                        <label asp-for="QteQuestoes" class="control-label fs-5">Quantidade de Questões:</label>
+                        <input asp-for="QteQuestoes" class="form-control" type="number" min="1" />
+                        <span asp-validation-for="QteQuestoes" class="text-danger"></span>
+                    </div>
+                    
                     <div class="form-group d-flex align-items-center justify-content-end mt-5 gap-3">
-                        <a href="/materias">Voltar para a listagem</a>
-                        <button type="submit" class="btn btn-primary rounded-3 px-5">Confirmar</button>
+                        <a asp-controller="Testes" asp-action="Index" class="btn btn-link">Voltar para a listagem</a>
+                        <button type="button" id="btn-gerar" class="btn btn-primary rounded-3 px-5">Gerar Teste</button>
                     </div>
                 </form>
+
+                <div id="modelo-teste" style="display:none;" class="mt-5">
+                    <h4>Modelo do Teste</h4>
+                    <div id="questoes-sorteadas"></div>
+                    <div class="d-flex gap-2 mt-3">
+                        <button id="btn-confirmar" class="btn btn-success">Confirmar</button>
+                        <button id="btn-cancelar" class="btn btn-secondary">Cancelar</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -42,4 +76,28 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Gerar Teste
+        $('#btn-gerar').on('click', function () {
+            var formData = $('#form-cadastro-teste').serialize();
+            $.post('/testes/SortearQuestoes', formData, function (data) {
+                $('#questoes-sorteadas').html(data);
+                $('#modelo-teste').show();
+            });
+        });
+
+        // Cancelar
+        $('#btn-cancelar').on('click', function () {
+            $('#form-cadastro-teste')[0].reset();
+            $('#modelo-teste').hide();
+        });
+
+        // Confirmar
+        $('#btn-confirmar').on('click', function () {
+            var formData = $('#form-cadastro-teste').serialize();
+            $.post('/testes/Cadastrar', formData, function () {
+                window.location.href = '/testes';
+            });
+        });
+    </script>
 }

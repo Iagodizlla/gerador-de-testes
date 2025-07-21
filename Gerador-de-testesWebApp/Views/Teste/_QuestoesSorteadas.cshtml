@@ -1,0 +1,17 @@
+﻿@model List<Gerador_de_testes.ModuloQuestao.Questao>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-warning">Nenhuma questão encontrada para os filtros informados.</div>
+}
+else
+{
+    <ol>
+        @foreach (var questao in Model)
+        {
+            <li>
+                <strong>@questao.Enunciado</strong>
+            </li>
+        }
+    </ol>
+}
