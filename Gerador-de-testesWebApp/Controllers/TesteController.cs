@@ -8,6 +8,7 @@ using Gerador_de_testesWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Runtime.CompilerServices;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Gerador_de_testesWebApp.Controllers
 {
@@ -54,7 +55,7 @@ namespace Gerador_de_testesWebApp.Controllers
 
             return View(viewModel);
         }
-        
+
 
         [HttpPost("cadastrar")]
         public IActionResult Cadastrar(CadastrarTesteViewModel cadastrarVM)
@@ -93,7 +94,7 @@ namespace Gerador_de_testesWebApp.Controllers
             var transacao = contexto.Database.BeginTransaction();
 
             try
-            {  
+            {
                 repositorioTestes.CadastrarRegistro(teste);
                 contexto.SaveChanges();
                 transacao.Commit();
@@ -103,8 +104,6 @@ namespace Gerador_de_testesWebApp.Controllers
                 transacao.Rollback();
                 throw;
             }
-
-            repositorioTestes.CadastrarRegistro(teste);
 
             return RedirectToAction("Index");
         }
@@ -121,6 +120,71 @@ namespace Gerador_de_testesWebApp.Controllers
             return PartialView("_QuestoesSorteadas", questoes);
         }
 
+        [HttpGet("editar/{id}")]
+        public IActionResult Editar(Guid id)
+        {
+            var teste = repositorioTestes.SelecionarRegistroPorId(id);
+            if (teste == null)
+            {
+                return NotFound();
+            }
+            var disciplinas = repositorioDisciplinas.SelecionarRegistros();
+            var materias = repositorioMaterias.SelecionarRegistros();
+            var editarVM = new EditarTesteViewModel(teste, disciplinas, materias);
+            return View(editarVM);
+        }
 
+        [HttpPost("editar/{id}")]
+        public IActionResult Editar(Guid id, EditarTesteViewModel editarVM)
+        {
+            if (!ModelState.IsValid)
+            {
+                var disciplinas = repositorioDisciplinas.SelecionarRegistros();
+                var materias = repositorioMaterias.SelecionarRegistros();
+                editarVM.DisciplinasDisponiveis = disciplinas.Select(d => new SelectListItem(d.Nome, d.Id.ToString())).ToList();
+                editarVM.MateriasDisponiveis = materias.Select(m => new SelectListItem(m.Nome, m.Id.ToString())).ToList();
+                return View(editarVM);
+            }
+            var testeExistente = repositorioTestes.SelecionarRegistroPorId(id);
+            if (testeExistente == null)
+            {
+                return NotFound();
+            }
+
+            var disciplina = repositorioDisciplinas.SelecionarRegistroPorId(editarVM.DisciplinaId);
+            var materia = repositorioMaterias.SelecionarRegistroPorId(editarVM.MateriaId);
+            var questoesFiltradas = repositorioQuestoes.SelecionarRegistros()
+                .Where(q => q.Materia.Id == editarVM.MateriaId && q.Materia.Serie == editarVM.Serie)
+                .ToList();
+            var random = new Random();
+            var questoesSorteadas = questoesFiltradas
+                .OrderBy(q => random.Next())
+                .Take(editarVM.QteQuestoes)
+                .ToList();
+            testeExistente.AtualizarRegistro(new Teste(
+                editarVM.Titulo,
+                new List<Disciplina> { disciplina },
+                editarVM.Serie,
+                new List<Materia> { materia },
+                editarVM.QteQuestoes,
+                questoesSorteadas
+            ));
+
+            var transacao = contexto.Database.BeginTransaction();
+
+            try
+            {
+                repositorioTestes.EditarRegistro(id, testeExistente);
+                contexto.SaveChanges();
+                transacao.Commit();
+            }
+            catch
+            {
+                transacao.Rollback();
+                throw;
+            }
+
+            return RedirectToAction("Index");
+        }
     }
 }

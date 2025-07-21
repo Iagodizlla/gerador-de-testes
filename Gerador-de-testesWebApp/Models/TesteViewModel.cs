@@ -58,10 +58,23 @@ namespace Gerador_de_testesWebApp.Models
 
     public class EditarTesteViewModel : FormularioTesteViewModel
     {
-        Guid Id { get; set; }
+
+        public Guid Id { get; set; }
         public Guid DisciplinaId { get; set; }
         public Guid MateriaId { get; set; }
+        public List<SelectListItem> DisciplinasDisponiveis { get; internal set; }
+        public List<SelectListItem> MateriasDisponiveis { get; internal set; }
 
+        private Teste teste;
+        private List<Disciplina> disciplinas;
+        private List<Materia> materias;
+
+        public EditarTesteViewModel(Teste teste, List<Disciplina> disciplinas, List<Materia> materias)
+        {
+            this.teste = teste;
+            this.disciplinas = disciplinas;
+            this.materias = materias;
+        }
         public EditarTesteViewModel()
         {
             Disciplinas = new List<SelectListItem>();
@@ -96,7 +109,6 @@ namespace Gerador_de_testesWebApp.Models
             }
             QuestoesSelecionadas = questoesSelecionadas;
         }
-
     }
 
 
