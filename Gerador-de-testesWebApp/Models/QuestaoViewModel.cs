@@ -139,6 +139,21 @@ public class CadastrarQuestaoViewModel : FormularioQuestaoViewModel
         }
     }
 
-    
+public class CadastrarAlternativaViewModel
+    {
+        [Required(ErrorMessage = "O campo \"Resposta\" é obrigatório.")]
+        public string? Resposta { get; set; }
+        public bool Correta { get; set; }
+        public Questao Questao { get; set; }
+        public CadastrarAlternativaViewModel() { }
+        public CadastrarAlternativaViewModel(string resposta, bool correta, Questao questao)
+        {
+            Resposta = resposta;
+            Correta = correta;
+            Questao = questao;
+        }
+}
+
+
 
 

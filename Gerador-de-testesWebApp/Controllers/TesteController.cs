@@ -1,4 +1,6 @@
-﻿using Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
+﻿using DinkToPdf;
+using DinkToPdf.Contracts;
+using Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
 using Gerador_de_testes.ModuloDeTestes;
 using Gerador_de_testes.ModuloDisciplina;
 using Gerador_de_testes.ModuloMateria;
@@ -7,6 +9,8 @@ using Gerador_de_testesWebApp.Extensions;
 using Gerador_de_testesWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Runtime.CompilerServices;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -15,6 +19,8 @@ namespace Gerador_de_testesWebApp.Controllers
     [Route("testes")]
     public class TesteController : Controller
     {
+        private readonly IConverter _pdfConverter;
+        private readonly ICompositeViewEngine _viewEngine;
         private readonly GeradorDeTestesDbContext contexto;
         private readonly IRepositorioTeste repositorioTestes;
         private readonly IRepositorioDisciplina repositorioDisciplinas;
@@ -26,13 +32,17 @@ namespace Gerador_de_testesWebApp.Controllers
             IRepositorioTeste repositorioTestes,
             IRepositorioDisciplina repositorioDisciplinas,
             IRepositorioMateria repositorioMaterias,
-            IRepositorioQuestao repositorioQuestoes)
+            IRepositorioQuestao repositorioQuestoes,
+            IConverter pdfConverter,
+            ICompositeViewEngine viewEngine)
         {
             this.contexto = contexto;
             this.repositorioTestes = repositorioTestes;
             this.repositorioDisciplinas = repositorioDisciplinas;
             this.repositorioMaterias = repositorioMaterias;
             this.repositorioQuestoes = repositorioQuestoes;
+            _pdfConverter = pdfConverter;
+            _viewEngine = viewEngine;
         }
 
         [HttpGet]
@@ -268,5 +278,51 @@ namespace Gerador_de_testesWebApp.Controllers
 
             return View("ResultadoTeste", model);
         }
+
+        [HttpGet("gerar-pdf/{id}")]
+        public IActionResult GerarPdf(Guid id)
+        {
+            var teste = repositorioTestes.SelecionarRegistroPorId(id);
+
+            var testePdf = RenderRazorViewToString(this, "PdfTeste", teste);
+
+            var doc = new HtmlToPdfDocument()
+            {
+                GlobalSettings = {
+                PaperSize = PaperKind.A4,
+                Orientation = Orientation.Portrait,
+                DocumentTitle = teste.Titulo
+                },
+                Objects = {
+                    new ObjectSettings() {
+                    HtmlContent = testePdf,
+                    }
+                }
+            };
+
+            var pdf = _pdfConverter.Convert(doc);
+            return File(pdf, "application/pdf", $"{teste.Titulo}.pdf");
+        }
+
+        private string RenderRazorViewToString(Controller controller, string viewName, object model)
+        {
+            controller.ViewData.Model = model;
+            using var sw = new StringWriter();
+            var viewResult = _viewEngine.FindView(controller.ControllerContext, viewName, false);
+            var viewContext = new ViewContext(
+                controller.ControllerContext,
+                viewResult.View,
+                controller.ViewData,
+                controller.TempData,
+                sw,
+                new HtmlHelperOptions()
+            );
+
+
+            viewResult.View.RenderAsync(viewContext).GetAwaiter().GetResult();
+
+            return sw.ToString();
+        }
+
     }
 }

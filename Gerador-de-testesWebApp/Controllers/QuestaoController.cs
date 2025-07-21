@@ -59,6 +59,11 @@ namespace Gerador_de_testesWebApp.Controllers
         public IActionResult Cadastrar(CadastrarQuestaoViewModel cadastrarVM)
         {
             var materias = repositorioMateria.SelecionarRegistros();
+            
+            if (!string.IsNullOrWhiteSpace(cadastrarVM.NomeMateria))
+            {
+                cadastrarVM.Materia = materias.FirstOrDefault(m => m.Nome == cadastrarVM.NomeMateria);
+            }
             if (cadastrarVM.NomeMateria is null)
             {
                 ModelState.AddModelError("NomeMateria", "Não é possivel adicionar uma questão sem uma matéria.");
@@ -100,6 +105,12 @@ namespace Gerador_de_testesWebApp.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        public IRepositorioMateria GetRepositorioMateria()
+        {
+            return repositorioMateria;
+        }
+
         [HttpGet("editar/{id:guid}")]
         public ActionResult Editar(Guid id)
         {
@@ -111,7 +122,8 @@ namespace Gerador_de_testesWebApp.Controllers
                 registroSelecionado.Materia,
                 registroSelecionado.Alternativas
             );
-            editarVM.MateriasDisponiveis = repositorioMateria.SelecionarRegistros();
+
+            //editarVM.MateriasDisponiveis = repositorioMateria.SelecionarRegistros();
 
             return View(editarVM);
         }

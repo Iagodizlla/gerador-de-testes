@@ -8,6 +8,8 @@ using Gerador_de_testes.ModuloMateria;
 using Gerador_de_testes.ModuloQuestao;
 using Gerador_de_testes.WebApp.DependencyInjection;
 using Gerador_de_testes.WebApp.Orm;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 
 namespace Gerador_de_testes.WebApp;
 
@@ -26,6 +28,9 @@ public class Program
         builder.Services.AddSerilogConfig(builder.Logging);
 
         builder.Services.AddControllersWithViews();
+
+        builder.Services.AddSingleton(typeof(IConverter),
+            new SynchronizedConverter(new PdfTools()));
 
         var app = builder.Build();
 

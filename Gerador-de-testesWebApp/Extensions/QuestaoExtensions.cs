@@ -9,10 +9,7 @@ namespace Gerador_de_testes.WebApp.Extensions
         {
             return new Questao(formularioVM.Enunciado!, formularioVM.Materia!, formularioVM.Alternativas!);
         }
-        public static Alternativa ParaEntidadeAlternativa(this CadastrarAlternativaViewModel cadastrarVm)
-        {
-            return new Alternativa(cadastrarVm.Resposta!, cadastrarVm.Correta, cadastrarVm.Questao);
-        }
+        public static Alternativa ParaEntidadeAlternativa(this CadastrarAlternativaViewModel cadastrarVm) => new Alternativa(cadastrarVm.Resposta!, cadastrarVm.Correta, cadastrarVm.Questao);
 
         public static DetalhesQuestaoViewModel ParaDetalhesVM(this Questao questao)
         {
