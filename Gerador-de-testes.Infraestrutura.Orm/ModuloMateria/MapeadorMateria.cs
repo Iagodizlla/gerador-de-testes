@@ -22,7 +22,8 @@ public class MapeadorMateria : IEntityTypeConfiguration<Materia>
             .HasMaxLength(50);
 
         builder.HasOne(x => x.Disciplina)
-            .WithMany(d => d.Materias);
+            .WithMany(d => d.Materias)
+            .IsRequired();
 
         builder.HasMany(m => m.Questoes)
                 .WithOne(q => q.Materia);
