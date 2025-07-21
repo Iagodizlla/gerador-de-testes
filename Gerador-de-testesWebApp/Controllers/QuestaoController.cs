@@ -19,6 +19,7 @@ namespace Gerador_de_testesWebApp.Controllers
         {
             this.contexto = contexto;
             this.repositorioQuestao = repositorioQuestao;
+            this.repositorioTeste = repositorioTeste;
         }
         [HttpGet]
         public IActionResult Index()
@@ -43,6 +44,8 @@ namespace Gerador_de_testesWebApp.Controllers
         public IActionResult Cadastrar(CadastrarQuestaoViewModel cadastrarVM)
         {
             var entidade = cadastrarVM.ParaEntidade();
+
+            repositorioQuestao.AtualizarAlternativa(entidade.Alternativas.FirstOrDefault(a => a.Correta)!);
 
             var transacao = contexto.Database.BeginTransaction();
 
@@ -82,9 +85,9 @@ namespace Gerador_de_testesWebApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Editar(Guid id, EditarQuestaoViewModel editarVM)
         {
-            var registros = repositorioQuestao.SelecionarRegistros();
-
             var entidadeEditada = editarVM.ParaEntidade();
+
+            repositorioQuestao.AtualizarAlternativa(entidadeEditada.Alternativas.FirstOrDefault(a => a.Correta)!);
 
             var transacao = contexto.Database.BeginTransaction();
 
@@ -153,105 +156,14 @@ namespace Gerador_de_testesWebApp.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-        [HttpGet("cadastrarAlternativa")]
-        public IActionResult CadastrarAlternativa(Guid id)
+        [HttpGet("detalhes/{id:guid}")]
+        public IActionResult Detalhes(Guid id)
         {
             var registroSelecionado = repositorioQuestao.SelecionarRegistroPorId(id);
-            var cadastrarVM = new CadastrarAlternativaViewModel();
 
-            return View(cadastrarVM);
+            var detalhesVM = new DetalhesQuestaoViewModel(registroSelecionado.Id,registroSelecionado.Enunciado, registroSelecionado.Materia, registroSelecionado.Alternativas);
+
+            return View(detalhesVM);
         }
-
-        [HttpPost("cadastrarAlternativa")]
-        [ValidateAntiForgeryToken]
-        public IActionResult CadastrarAlternativa(CadastrarAlternativaViewModel cadastrarVM)
-        {
-            var entidade = cadastrarVM.ParaEntidadeAlternativa();
-
-            var transacao = contexto.Database.BeginTransaction();
-
-            try
-            {
-                repositorioQuestao.AdicionarAlternativa(entidade, entidade.Questao.Id);
-
-                contexto.SaveChanges();
-
-                transacao.Commit();
-            }
-            catch (Exception)
-            {
-                transacao.Rollback();
-
-                throw;
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-        [HttpGet("atualizarAlternativa/{id:guid}")]
-        public IActionResult AtualizarAlternativa(Guid idAlternativa)
-        {
-            var AtualizarVM = new RemoverAlternativaViewModel(idAlternativa);
-
-            return View(AtualizarVM);
-        }
-
-        [HttpPost("atualizarAlternativa/{id:guid}")]
-        [ValidateAntiForgeryToken]
-        public IActionResult AtualizarAlternativa(RemoverAlternativaViewModel AtualizarVM)
-        {
-            var registro = repositorioQuestao.SelecionarAlternativa(AtualizarVM.Id);
-            var transacao = contexto.Database.BeginTransaction();
-
-            try
-            {
-                repositorioQuestao.AtualizarAlternativa(registro);
-
-                contexto.SaveChanges();
-
-                transacao.Commit();
-            }
-            catch (Exception)
-            {
-                transacao.Rollback();
-
-                throw;
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-        [HttpGet("removerAlternativa/{id:guid}")]
-        public IActionResult RemoverAlternativa(Guid idAlternativa)
-        {
-            var RemoverVM = new RemoverAlternativaViewModel(idAlternativa);
-
-            return View(RemoverVM);
-        }
-
-        [HttpPost("removerAlternativa/{id:guid}")]
-        [ValidateAntiForgeryToken]
-        public IActionResult RemoverAlternativa(RemoverAlternativaViewModel RemoverVM)
-        {
-            var registro = repositorioQuestao.SelecionarAlternativa(RemoverVM.Id);
-            var transacao = contexto.Database.BeginTransaction();
-
-            try
-            {
-                repositorioQuestao.RemoverAlternativa(registro);
-
-                contexto.SaveChanges();
-
-                transacao.Commit();
-            }
-            catch (Exception)
-            {
-                transacao.Rollback();
-
-                throw;
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-
     }
 }
