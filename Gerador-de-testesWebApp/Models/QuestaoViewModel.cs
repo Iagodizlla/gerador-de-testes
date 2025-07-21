@@ -1,6 +1,7 @@
 ﻿using Gerador_de_testes.ModuloMateria;
 using Gerador_de_testes.ModuloQuestao;
 using Gerador_de_testes.WebApp.Extensions;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace Gerador_de_testes.WebApp.Models;
@@ -19,9 +20,48 @@ namespace Gerador_de_testes.WebApp.Models;
         [MinLength(2, ErrorMessage = "O campo \"Alternativas\" precisa conter 2 alternativas no mínimo.")]
         [MaxLength(5, ErrorMessage = "O campo \"Alternativas\" precisa conter 5 alternativas no máximo.")]
         public List<Alternativa>? Alternativas { get; set; }
+        public List<SelectListItem> MateriasDisponiveis { get; set; } = new();
+        public string? NomeMateria { get; set; }
+        public class GerenciarAlternativasViewModel
+        {
+            public DetalhesQuestaoViewModel Questao { get; set; }
+            public List<AlternativaQuestaoViewModel> Alternativas { get; set; }
+
+            public GerenciarAlternativasViewModel() { }
+
+            public GerenciarAlternativasViewModel(Questao questao) : this()
+            {
+                Questao = questao.ParaDetalhesVM();
+
+                Alternativas = new List<AlternativaQuestaoViewModel>();
+
+                foreach (var i in questao.Alternativas)
+                {
+                    var itemVM = new AlternativaQuestaoViewModel(i.Id, i.Resposta, i.Correta);
+
+                    Alternativas.Add(itemVM);
+                }
+            }
+        }
+
+        public class AlternativaQuestaoViewModel
+        {
+            public Guid Id { get; set; }
+
+            [Required(ErrorMessage = "O campo \"Resposta\" é obrigatório.")]
+            public string Resposta { get; set; }
+            public bool Correta { get; set; }
+
+            public AlternativaQuestaoViewModel(Guid id, string resposta, bool correta)
+            {
+                Id = id;
+                Resposta = resposta;
+                Correta = correta;
+            }
+        }
     }
 
-    public class CadastrarQuestaoViewModel : FormularioQuestaoViewModel
+public class CadastrarQuestaoViewModel : FormularioQuestaoViewModel
     {
         public CadastrarQuestaoViewModel()
         {
@@ -99,34 +139,6 @@ namespace Gerador_de_testes.WebApp.Models;
         }
     }
 
-public class CadastrarAlternativaViewModel
-{
-    public Guid Id { get; set; }
-    public string Resposta { get; set; }
-    public Questao Questao { get; set; }
-    public bool Correta { get; set; }
-    public CadastrarAlternativaViewModel()
-    {
-        Questao = new Questao();
-    }
-    public CadastrarAlternativaViewModel(Guid id, string resposta, Questao questao, bool correta) : this()
-    {
-        Id = id;
-        Resposta = resposta;
-        Questao = questao;
-        Correta = correta;
-    }
-}
-    public class RemoverAlternativaViewModel
-    {
-        public Guid Id { get; set; }
-    public RemoverAlternativaViewModel()
-        {
-        }
-        public RemoverAlternativaViewModel(Guid id) : this()
-        {
-            Id = id;
-        }
-    }
+    
 
 

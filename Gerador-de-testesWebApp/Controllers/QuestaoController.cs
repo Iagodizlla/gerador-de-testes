@@ -1,10 +1,14 @@
 ﻿using Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
 using Gerador_de_testes.ModuloDeTestes;
 using Gerador_de_testes.ModuloDisciplina;
+using Gerador_de_testes.ModuloMateria;
 using Gerador_de_testes.ModuloQuestao;
 using Gerador_de_testes.WebApp.Extensions;
 using Gerador_de_testes.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore.Metadata;
+using static Gerador_de_testes.WebApp.Models.FormularioQuestaoViewModel;
 
 namespace Gerador_de_testesWebApp.Controllers
 {
@@ -14,12 +18,14 @@ namespace Gerador_de_testesWebApp.Controllers
         private readonly GeradorDeTestesDbContext contexto;
         private readonly IRepositorioQuestao repositorioQuestao;
         private readonly IRepositorioTeste repositorioTeste;
+        private readonly IRepositorioMateria repositorioMateria;
 
-        public QuestaoController(GeradorDeTestesDbContext contexto, IRepositorioQuestao repositorioQuestao, IRepositorioTeste repositorioTeste)
+        public QuestaoController(GeradorDeTestesDbContext contexto, IRepositorioQuestao repositorioQuestao, IRepositorioTeste repositorioTeste, IRepositorioMateria repositorioMateria)
         {
             this.contexto = contexto;
             this.repositorioQuestao = repositorioQuestao;
             this.repositorioTeste = repositorioTeste;
+            this.repositorioMateria = repositorioMateria;
         }
         [HttpGet]
         public IActionResult Index()
@@ -35,6 +41,15 @@ namespace Gerador_de_testesWebApp.Controllers
         public IActionResult Cadastrar()
         {
             var cadastrarVM = new CadastrarQuestaoViewModel();
+            List<Materia> materias = repositorioMateria.SelecionarRegistros();
+            foreach (var item in materias)
+            {
+                cadastrarVM.MateriasDisponiveis.Add(new SelectListItem
+                {
+                    Text = item.Nome
+                });
+            }
+
 
             return View(cadastrarVM);
         }
@@ -43,16 +58,35 @@ namespace Gerador_de_testesWebApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Cadastrar(CadastrarQuestaoViewModel cadastrarVM)
         {
+            var materias = repositorioMateria.SelecionarRegistros();
+            if (cadastrarVM.NomeMateria is null)
+            {
+                ModelState.AddModelError("NomeMateria", "Não é possivel adicionar uma questão sem uma matéria.");
+            }
             var entidade = cadastrarVM.ParaEntidade();
+            if (entidade.Alternativas.FirstOrDefault(a => a.Correta) is null)
+            {
+                ModelState.AddModelError("Alternativas", "Não é possivel adicionar uma questão sem uma alternativa correta.");
+            }
+            if (!ModelState.IsValid)
+            {
+                foreach (var item in materias)
+                {
+                    cadastrarVM.MateriasDisponiveis.Add(new SelectListItem
+                    {
+                        Text = item.Nome
+                    });
+                }
 
-            repositorioQuestao.AtualizarAlternativa(entidade.Alternativas.FirstOrDefault(a => a.Correta)!);
+                return View(cadastrarVM);
+            }
 
             var transacao = contexto.Database.BeginTransaction();
 
             try
             {
                 repositorioQuestao.CadastrarRegistro(entidade);
-
+                repositorioQuestao.AtualizarAlternativa(entidade.Alternativas.FirstOrDefault(a => a.Correta)!);
                 contexto.SaveChanges();
 
                 transacao.Commit();
@@ -77,6 +111,7 @@ namespace Gerador_de_testesWebApp.Controllers
                 registroSelecionado.Materia,
                 registroSelecionado.Alternativas
             );
+            editarVM.MateriasDisponiveis = repositorioMateria.SelecionarRegistros();
 
             return View(editarVM);
         }
@@ -161,9 +196,23 @@ namespace Gerador_de_testesWebApp.Controllers
         {
             var registroSelecionado = repositorioQuestao.SelecionarRegistroPorId(id);
 
-            var detalhesVM = new DetalhesQuestaoViewModel(registroSelecionado.Id,registroSelecionado.Enunciado, registroSelecionado.Materia, registroSelecionado.Alternativas);
+            var detalhesVM = new DetalhesQuestaoViewModel(registroSelecionado.Id, registroSelecionado.Enunciado, registroSelecionado.Materia, registroSelecionado.Alternativas);
 
             return View(detalhesVM);
+        }
+        [HttpPost, Route("/questoes/adicionar-alternativa")]
+        public IActionResult AdicionarAlternativa(Guid id, AlternativaQuestaoViewModel alternativaVM)
+        {
+            var QuestaoSelecionada = repositorioQuestao.SelecionarRegistroPorId(id);
+
+            if (QuestaoSelecionada is null)
+                return RedirectToAction(nameof(Index));
+            var alternativa = repositorioQuestao.SelecionarAlternativa(alternativaVM.Id);
+            repositorioQuestao.AdicionarAlternativa(alternativa, id);
+
+            var gerenciarAlternativasViewModel = new GerenciarAlternativasViewModel(QuestaoSelecionada);
+
+            return View(nameof(Cadastrar), gerenciarAlternativasViewModel);
         }
     }
 }

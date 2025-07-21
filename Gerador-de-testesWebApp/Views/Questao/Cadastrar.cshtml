@@ -1,36 +1,33 @@
 ﻿﻿@using static Gerador_de_testes.WebApp.Models.FormularioQuestaoViewModel
-@model CadastrarQuestaoViewModel
+@model FormularioQuestaoViewModel
 
 @{
     Layout = "_Layout";
     ViewBag.Titulo = "Cadastro de Questão";
 }
-
-<hr />
-<head>
+<style>
     .card {
-    padding: 10px;
-    margin: 10px 0;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    background-color: #f2f2f2;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+        padding: 10px;
+        margin: 10px 0;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        background-color: #f2f2f2;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    .card.correta {
-    background-color: #d4edda;
-    border-color: #28a745;
-    }
+        .card.correta {
+            background-color: #d4edda;
+            border-color: #28a745;
+        }
 
-    .card.errada {
-    background-color: #f8d7da;
-    border-color: #dc3545;
-    }
-
-
-</head>
+        .card.errada {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+        }
+</style>
+<hr />
 <div class="row justify-content-center my-5">
     <div class="col-md-8">
         <div class="card rounded-4 border-0">
@@ -46,19 +43,26 @@
                         <span asp-validation-for="Enunciado" class="text-danger"></span>
                     </div>
                     <div class="form-group d-grid mt-3 gap-2">
-                        <label asp-for="Materia" class="control-label fs-5">Serie:</label>
-                        <input asp-for="Materia" class="form-control" value="@Model.Materia" />
-                        <span asp-validation-for="Materia" class="text-danger"></span>
-                    </div>
-                    <div id="alternativas-container">
-                        <div class="card errada" data-index="0">
-                            <input type="text" name="Alternativas[0].Resposta" placeholder="Alternativa 1" class="form-control" />
-                            <input type="hidden" name="Alternativas[0].Correta" value="false" />
-                            <button type="button" onclick="definirCorreta(0)" class="btn btn-outline-danger">Errada</button>
-                        </div>
+                        <label asp-for="NomeMateria" class="control-label fs-5">Matéria:</label>
+                        <select asp-for="NomeMateria" asp-items="Model.MateriasDisponiveis" class="form-control">
+                            <option value="">-- Selecione uma matéria --</option>
+                        </select>
+                        <span asp-validation-for="NomeMateria" class="text-danger"></span>
                     </div>
 
-                    <button type="button" class="btn btn-secondary mt-3" onclick="adicionarAlternativa()">Adicionar alternativa</button>
+                    <h4 class="my-3">Alternativas</h4>
+
+                    <form class="d-flex flex-wrap gap-2 align-items-center" action="/questoes/adicionar-alternativa" method="post">
+                        <div class="col">
+                            <label class="control-label">Resposta da Alternativa: </label>
+                            <input name="Resposta" class="form-control w-100" />
+                        </div>
+
+                        <button type="submit" class="btn btn-outline-primary align-self-end col-lg-2">
+                            Adicionar
+                        </button>
+                    </form>
+
                     <span asp-validation-for="Alternativas" class="text-danger"></span>
 
                     <div class="form-group d-flex align-items-center justify-content-end mt-5 gap-3">
@@ -74,108 +78,4 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
-    <script>
-        
-        let contador = 1;
-
-        function adicionarAlternativa() {
-            const container = document.getElementById('alternativas-container');
-
-            const card = document.createElement('div');
-            card.className = 'card card_errada';
-            card.setAttribute('data-index', contador);
-
-            const inputResposta = document.createElement('input');
-            inputResposta.type = 'text';
-            inputResposta.name = `Alternativas[${contador}].Resposta`;
-            inputResposta.placeholder = `Alternativa ${contador + 1}`;
-            inputResposta.classList.add('form-control');
-
-            const inputCorreta = document.createElement('input');
-            inputCorreta.type = 'hidden';
-            inputCorreta.name = `Alternativas[${contador}].Correta`;
-            inputCorreta.value = "false";
-
-            const botaoCorreta = document.createElement('button');
-            botaoCorreta.type = 'button';
-            botaoCorreta.className = 'btn btn-outline-danger';
-            botaoCorreta.textContent = "Errada";
-            botaoCorreta.onclick = () => definirCorreta(contador);
-
-            const botaoRemover = document.createElement('button');
-            botaoRemover.type = 'button';
-            botaoRemover.className = 'btn btn-outline-secondary';
-            botaoRemover.textContent = "Remover";
-            botaoRemover.onclick = () => removerAlternativa(card);
-
-            card.appendChild(inputResposta);
-            card.appendChild(inputCorreta);
-            card.appendChild(botaoCorreta);
-            card.appendChild(botaoRemover);
-
-            container.appendChild(card);
-            contador++;
-        }
-        function removerAlternativa(cardRemovido) {
-            cardRemovido.remove();
-            atualizarIndices();
-        }
-
-        function definirCorreta(indiceSelecionado) {
-            const cards = document.querySelectorAll('.card');
-
-            cards.forEach(card => {
-                const index = parseInt(card.getAttribute('data-index'));
-                const inputCorreta = card.querySelector(`input[name="Alternativas[${index}].Correta"]`);
-                const botao = card.querySelector('button');
-
-                if (index === indiceSelecionado) {
-                    card.classList.remove('errada');
-                    card.classList.add('correta');
-                    inputCorreta.value = "true";
-                    botao.textContent = "Certa";
-                    botao.classList.replace('btn-outline-danger', 'btn-outline-success');
-                } else {
-                    card.classList.remove('correta');
-                    card.classList.add('errada');
-                    inputCorreta.value = "false";
-                    botao.textContent = "Errada";
-                    botao.classList.replace('btn-outline-success', 'btn-outline-danger');
-                }
-            });
-        }
-            function atualizarIndices() {
-            const cards = document.querySelectorAll('#alternativas-container .card');
-            cards.forEach((card, newIndex) => {
-                card.setAttribute('data-index', newIndex);
-
-                const inputResposta = card.querySelector('input[name^="Alternativas"][name$=".Resposta"]');
-                const inputCorreta = card.querySelector('input[name^="Alternativas"][name$=".Correta"]');
-                const botaoCorreta = card.querySelector('button');
-
-                if (inputResposta) inputResposta.name = `Alternativas[${newIndex}].Resposta`;
-                if (inputResposta) inputResposta.placeholder = `Alternativa ${newIndex + 1}`;
-                if (inputCorreta) inputCorreta.name = `Alternativas[${newIndex}].Correta`;
-
-                if (botaoCorreta) {
-                    botaoCorreta.onclick = () => definirCorreta(newIndex);
-                }
-            });
-        }
-            document.querySelector('form').addEventListener("submit", function(e) {
-                const corretas = document.querySelectorAll('input[name^="Alternativas"][name$=".Correta"]');
-                let peloMenosUmaCerta = false;
-
-                corretas.forEach(input => {
-                    if (input.value === "true") {
-                    peloMenosUmaCerta = true;
-                    }
-                });
-
-                if (!peloMenosUmaCerta) {
-                    e.preventDefault();
-                    alert("Você precisa marcar pelo menos uma alternativa como correta.");
-                }
-            });
-    </script>
 }
