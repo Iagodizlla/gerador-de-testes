@@ -58,6 +58,7 @@ namespace Gerador_de_testesWebApp.Controllers
 
 
         [HttpPost("cadastrar")]
+        [ValidateAntiForgeryToken]
         public IActionResult Cadastrar(CadastrarTesteViewModel cadastrarVM)
         {
             if (!ModelState.IsValid)
@@ -109,6 +110,7 @@ namespace Gerador_de_testesWebApp.Controllers
         }
 
         [HttpPost("SortearQuestoes")]
+        [ValidateAntiForgeryToken]
         public IActionResult SortearQuestoes(CadastrarTesteViewModel model)
         {
             var questoes = repositorioQuestoes.SelecionarRegistros()
@@ -135,6 +137,7 @@ namespace Gerador_de_testesWebApp.Controllers
         }
 
         [HttpPost("editar/{id}")]
+        [ValidateAntiForgeryToken]
         public IActionResult Editar(Guid id, EditarTesteViewModel editarVM)
         {
             if (!ModelState.IsValid)
@@ -175,6 +178,49 @@ namespace Gerador_de_testesWebApp.Controllers
             try
             {
                 repositorioTestes.EditarRegistro(id, testeExistente);
+                contexto.SaveChanges();
+                transacao.Commit();
+            }
+            catch
+            {
+                transacao.Rollback();
+                throw;
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet("excluir/{id:guid}")]
+        public IActionResult Excluir(Guid id, ExcluirTesteViewModel excluirVM)
+        {
+            var registroSelecionado = repositorioTestes.SelecionarRegistroPorId(id);
+            excluirVM = new ExcluirTesteViewModel(registroSelecionado.Titulo);
+
+            if (registroSelecionado == null)
+            {
+                ModelState.AddModelError("RegistroNaoEncontrado", "Teste não encontrado.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(excluirVM);
+        }
+
+        [HttpPost("excluir/{id:guid}")]
+        [ValidateAntiForgeryToken]
+        public IActionResult Excluir(Guid id)
+        {
+            var registroSelecionado = repositorioTestes.SelecionarRegistroPorId(id);
+            if (registroSelecionado == null)
+            {
+                ModelState.AddModelError("RegistroNaoEncontrado", "Teste não encontrado.");
+                return RedirectToAction(nameof(Index));
+            }
+
+            var transacao = contexto.Database.BeginTransaction();
+
+            try
+            {
+                repositorioTestes.ExcluirRegistro(id);
                 contexto.SaveChanges();
                 transacao.Commit();
             }

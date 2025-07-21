@@ -117,9 +117,8 @@ namespace Gerador_de_testesWebApp.Models
         public Guid Id { get; set; }
         public string Titulo { get; set; }
 
-        public ExcluirTesteViewModel(Guid id, string titulo)
+        public ExcluirTesteViewModel(string titulo)
         {
-            Id = id;
             Titulo = titulo;
         }
     }
