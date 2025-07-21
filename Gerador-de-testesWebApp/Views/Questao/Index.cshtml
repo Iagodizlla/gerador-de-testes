@@ -1,0 +1,40 @@
+﻿﻿@{
+Layout = "_Layout";
+ViewBag.Titulo = "Visualização de Questões";
+}
+
+<p>
+    <a class="btn btn-primary px-4" href="/questoes/cadastrar">
+        <i class="bi bi-plus"></i>
+        Cadastrar Novo/a
+    </a>
+</p>
+
+<hr />
+
+<div class="d-flex flex-wrap gap-2">
+    @foreach (var item in Model.Registros)
+    {
+        <div class="col-12 col-md-3">
+            <div class="card border-0">
+                <div class="card-body">
+                    <h5 class="card-title">Enunciado: @item.Enunciado</h5>
+                    <h5 class="card-title">Matéria: @item.Materia</h5>
+
+                    <span class="d-flex justify-content-end mt-4 gap-1">
+                        <a href="/questoes/editar/@item.Id" class="btn btn-primary rounded-circle opcao-card">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <a href="/materias/datlhesAlternativa/@item.Id" class="btn btn-danger rounded-circle opcao-card">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="/questoes/excluir/@item.Id" class="btn btn-danger rounded-circle opcao-card">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    }
+</div>
