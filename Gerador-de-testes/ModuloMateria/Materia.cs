@@ -26,6 +26,7 @@ public class Materia : EntidadeBase<Materia>
 
     public Materia(string nome, string serie, Disciplina disciplina)
     {
+        Id = Guid.NewGuid();
         Nome = nome;
         Serie = serie;
         Disciplina = disciplina;
