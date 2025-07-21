@@ -232,5 +232,41 @@ namespace Gerador_de_testesWebApp.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpGet("realizar/{id}")]
+        public IActionResult Realizar(Guid id)
+        {
+            var teste = repositorioTestes.SelecionarRegistroPorId(id);
+            if (teste == null)
+                return NotFound();
+
+            // Crie um ViewModel que contenha o teste, questões e alternativas
+            var realizarVM = new RealizarTesteViewModel(teste);
+            return View(realizarVM);
+        }
+
+        [HttpPost("realizar/{id}")]
+        public IActionResult Realizar(Guid id, RealizarTesteViewModel model)
+        {
+            var teste = repositorioTestes.SelecionarRegistroPorId(id);
+            if (teste == null)
+                return NotFound();
+
+            // Verifica as respostas
+            var resultado = new List<bool>();
+            for (int i = 0; i < teste.QuestoesSelecionadas.Count; i++)
+            {
+                var questao = teste.QuestoesSelecionadas[i];
+                var respostaUsuario = model.Respostas[i];
+                var correta = questao.Alternativas.Any(a => a.Id == respostaUsuario && a.Correta);
+                resultado.Add(correta);
+            }
+
+            model.Resultados = resultado;
+            model.Titulo = teste.Titulo;
+            model.Questoes = teste.QuestoesSelecionadas;
+
+            return View("ResultadoTeste", model);
+        }
     }
 }

@@ -165,4 +165,21 @@ namespace Gerador_de_testesWebApp.Models
         }
 
     }
+    public class RealizarTesteViewModel
+    {
+        public Guid TesteId { get; set; }
+        public string Titulo { get; set; }
+        public List<Questao> Questoes { get; set; }
+        public List<Guid> Respostas { get; set; } = new();
+        public List<bool> Resultados { get; set; } = new();
+
+        public RealizarTesteViewModel() { }
+        public RealizarTesteViewModel(Teste teste)
+        {
+            TesteId = teste.Id;
+            Titulo = teste.Titulo;
+            Questoes = teste.QuestoesSelecionadas;
+            Respostas = new List<Guid>(new Guid[teste.QuestoesSelecionadas.Count]);
+        }
+    }
 }

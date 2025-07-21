@@ -2,15 +2,21 @@
 
 @if (Model == null || !Model.Any())
 {
-    <div class="alert alert-warning">Nenhuma questão encontrada para os filtros informados.</div>
+    <div class="alert alert-warning">Nenhuma questão sorteada.</div>
 }
 else
 {
     <ol>
         @foreach (var questao in Model)
         {
-            <li>
-                <strong>@questao.Enunciado</strong>
+            <li class="mb-3">
+                <div><strong>@questao.Enunciado</strong></div>
+                <ol type="a">
+                    @foreach (var alternativa in questao.Alternativas.Take(4))
+                    {
+                        <li>@alternativa.Resposta</li>
+                    }
+                </ol>
             </li>
         }
     </ol>
