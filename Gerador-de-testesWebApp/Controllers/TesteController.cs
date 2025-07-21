@@ -324,5 +324,33 @@ namespace Gerador_de_testesWebApp.Controllers
             return sw.ToString();
         }
 
+        [HttpGet("gabarito-pdf/{id}")]
+        public IActionResult GerarGabaritoPdf(Guid id)
+        {
+            var teste = repositorioTestes.SelecionarRegistroPorId(id);
+            if (teste == null)
+                return NotFound();
+
+            var html = RenderRazorViewToString(this, "GabaritoPdf", teste);
+
+            var doc = new HtmlToPdfDocument()
+            {
+                GlobalSettings = {
+                PaperSize = PaperKind.A4,
+                Orientation = Orientation.Portrait,
+                DocumentTitle = "Gabarito - " + teste.Titulo
+                },
+               
+                Objects = {
+                    new ObjectSettings() {
+                    HtmlContent = html
+                    }
+                }
+            };
+
+            var pdf = _pdfConverter.Convert(doc);
+            return File(pdf, "application/pdf", $"Gabarito_{teste.Titulo}.pdf");
+        }
+
     }
 }

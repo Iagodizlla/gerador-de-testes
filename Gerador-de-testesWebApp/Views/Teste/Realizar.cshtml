@@ -29,6 +29,9 @@
     }
     <button type="submit" class="btn btn-success">Confirmar Teste</button>
     <a class="btn btn-outline-secondary" asp-controller="Teste" asp-action="GerarPdf" asp-route-id="@Model.TesteId" target="_blank">
-        <i class="bi bi-file-earmark-pdf"></i> Gerar PDF
+        <i class="bi bi-file-earmark-pdf"></i> Gerar PDF do Teste
+    </a>
+    <a class="btn btn-outline-secondary" asp-controller="Teste" asp-action="GerarGabaritoPdf" asp-route-id="@Model.TesteId" target="_blank">
+        <i class="bi bi-file-earmark-pdf"></i> Gerar Gabarito Do Teste
     </a>
 </form>
