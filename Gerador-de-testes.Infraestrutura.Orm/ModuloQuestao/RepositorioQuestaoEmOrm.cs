@@ -11,7 +11,6 @@ namespace Gerador_de_testes.Infraestrutura.Orm.ModuloGestao
         {
             registros = contextoDados.Set<Questao>();
         }
-
         public void AdicionarAlternativa(Alternativa alternativa, Guid IdQuestao)
         {
             var registro = SelecionarRegistroPorId(IdQuestao)!;

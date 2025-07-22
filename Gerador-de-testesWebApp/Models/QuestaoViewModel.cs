@@ -12,61 +12,21 @@ namespace Gerador_de_testes.WebApp.Models;
         [MinLength(2, ErrorMessage = "O campo \"Enunciado\" precisa conter ao menos 2 caracteres.")]
         [MaxLength(100, ErrorMessage = "O campo \"Enunciado\" precisa conter no máximo 500 caracteres.")]
         public string? Enunciado { get; set; }
-
-        [Required(ErrorMessage = "O campo \"Matéria\" é obrigatório.")]
-        public Materia? Materia { get; set; }
-
         [Required(ErrorMessage = "O campo \"Alternativas\" é obrigatório.")]
         [MinLength(2, ErrorMessage = "O campo \"Alternativas\" precisa conter 2 alternativas no mínimo.")]
         [MaxLength(5, ErrorMessage = "O campo \"Alternativas\" precisa conter 5 alternativas no máximo.")]
-        public List<Alternativa>? Alternativas { get; set; }
+        public List<string>? AlternativasRespostas { get; set; }
         public List<SelectListItem> MateriasDisponiveis { get; set; } = new();
+        [Required(ErrorMessage = "O campo \"Matéria\" é obrigatório.")]
         public string? NomeMateria { get; set; }
-        public class GerenciarAlternativasViewModel
-        {
-            public DetalhesQuestaoViewModel Questao { get; set; }
-            public List<AlternativaQuestaoViewModel> Alternativas { get; set; }
+        public int? AlternativaCorretaIndice { get; set; } // Pega o Indice da alternativa correta
+}
 
-            public GerenciarAlternativasViewModel() { }
-
-            public GerenciarAlternativasViewModel(Questao questao) : this()
-            {
-                Questao = questao.ParaDetalhesVM();
-
-                Alternativas = new List<AlternativaQuestaoViewModel>();
-
-                foreach (var i in questao.Alternativas)
-                {
-                    var itemVM = new AlternativaQuestaoViewModel(i.Id, i.Resposta, i.Correta);
-
-                    Alternativas.Add(itemVM);
-                }
-            }
-        }
-
-        public class AlternativaQuestaoViewModel
-        {
-            public Guid Id { get; set; }
-
-            [Required(ErrorMessage = "O campo \"Resposta\" é obrigatório.")]
-            public string Resposta { get; set; }
-            public bool Correta { get; set; }
-
-            public AlternativaQuestaoViewModel(Guid id, string resposta, bool correta)
-            {
-                Id = id;
-                Resposta = resposta;
-                Correta = correta;
-            }
-        }
-    }
-
-public class CadastrarQuestaoViewModel : FormularioQuestaoViewModel
+    public class CadastrarQuestaoViewModel : FormularioQuestaoViewModel
     {
         public CadastrarQuestaoViewModel()
         {
-            Materia = new Materia();
-            Alternativas = new List<Alternativa>();
+            AlternativasRespostas = new List<string>();
         }
 
         public CadastrarQuestaoViewModel(string enunciado) : this()
@@ -84,12 +44,11 @@ public class CadastrarQuestaoViewModel : FormularioQuestaoViewModel
             
         }
 
-        public EditarQuestaoViewModel(Guid id, string enunciado, Materia materia, List<Alternativa> alternativas) : this()
+        public EditarQuestaoViewModel(Guid id, string enunciado, List<string> alternativas) : this()
         {
             Id = id;
             Enunciado = enunciado;
-            Materia = materia;
-            Alternativas = alternativas;
+            AlternativasRespostas = alternativas;
         }
     }
 
@@ -152,6 +111,43 @@ public class CadastrarAlternativaViewModel
             Correta = correta;
             Questao = questao;
         }
+    public class GerenciarAlternativasViewModel : FormularioQuestaoViewModel
+    {
+        public DetalhesQuestaoViewModel Questao { get; set; }
+        public List<AlternativaQuestaoViewModel> AlternativasViewModel { get; set; }
+        public Alternativa alternativa { get; set; }
+        public GerenciarAlternativasViewModel() { }
+
+        public GerenciarAlternativasViewModel(Questao questao) : this()
+        {
+            Questao = questao.ParaDetalhesVM();
+
+            AlternativasViewModel = new List<AlternativaQuestaoViewModel>();
+
+            foreach (var i in questao.Alternativas)
+            {
+                var itemVM = new AlternativaQuestaoViewModel(i.Id, i.Resposta, i.Correta);
+
+                AlternativasViewModel.Add(itemVM);
+            }
+        }
+    }
+
+    public class AlternativaQuestaoViewModel : GerenciarAlternativasViewModel
+    {
+        public Guid IdAlternativa { get; set; }
+
+        [Required(ErrorMessage = "O campo \"Resposta\" é obrigatório.")]
+        public string Resposta { get; set; }
+        public bool Correta { get; set; }
+
+        public AlternativaQuestaoViewModel(Guid id, string resposta, bool correta)
+        {
+            IdAlternativa = id;
+            Resposta = resposta;
+            Correta = correta;
+        }
+    }
 }
 
 

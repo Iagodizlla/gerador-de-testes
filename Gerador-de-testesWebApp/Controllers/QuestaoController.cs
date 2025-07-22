@@ -8,6 +8,7 @@ using Gerador_de_testes.WebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Metadata;
+using System.Security.Cryptography.X509Certificates;
 using static Gerador_de_testes.WebApp.Models.FormularioQuestaoViewModel;
 
 namespace Gerador_de_testesWebApp.Controllers
@@ -60,18 +61,18 @@ namespace Gerador_de_testesWebApp.Controllers
         {
             var materias = repositorioMateria.SelecionarRegistros();
             
-            if (!string.IsNullOrWhiteSpace(cadastrarVM.NomeMateria))
-            {
-                cadastrarVM.Materia = materias.FirstOrDefault(m => m.Nome == cadastrarVM.NomeMateria);
-            }
-            if (cadastrarVM.NomeMateria is null)
+            if (string.IsNullOrWhiteSpace(cadastrarVM.NomeMateria))
             {
                 ModelState.AddModelError("NomeMateria", "Não é possivel adicionar uma questão sem uma matéria.");
             }
-            var entidade = cadastrarVM.ParaEntidade();
-            if (entidade.Alternativas.FirstOrDefault(a => a.Correta) is null)
+               
+            if (cadastrarVM.AlternativaCorretaIndice == null || cadastrarVM.AlternativaCorretaIndice < 0 || cadastrarVM.AlternativaCorretaIndice >= cadastrarVM.AlternativasRespostas.Count)
             {
-                ModelState.AddModelError("Alternativas", "Não é possivel adicionar uma questão sem uma alternativa correta.");
+                ModelState.AddModelError("AlternativaCorretaIndice", "Não é possivel adicionar uma questão sem uma alternativa correta.");
+            }
+            if (cadastrarVM.AlternativasRespostas == null || cadastrarVM.AlternativasRespostas.Count < 2 )
+            {
+                ModelState.AddModelError("AlternativasRespostas", "É necessário haver pelo menos 2 alternativas.");
             }
             if (!ModelState.IsValid)
             {
@@ -82,15 +83,31 @@ namespace Gerador_de_testesWebApp.Controllers
                         Text = item.Nome
                     });
                 }
-
                 return View(cadastrarVM);
             }
+            var entidade = cadastrarVM.ParaEntidade();
+
 
             var transacao = contexto.Database.BeginTransaction();
 
             try
             {
                 repositorioQuestao.CadastrarRegistro(entidade);
+                entidade.Materia = materias.FirstOrDefault(m => m.Nome == cadastrarVM.NomeMateria)!;
+                for (int i = 0; i < cadastrarVM.AlternativasRespostas!.Count; i++)
+                {
+                    if (i == cadastrarVM.AlternativaCorretaIndice)
+                    {
+                        Alternativa alternativa = new Alternativa(cadastrarVM.AlternativasRespostas[i], true, entidade);
+                        repositorioQuestao.AdicionarAlternativa(alternativa, entidade.Id);
+                    }
+                    else
+                    {
+                        Alternativa alternativa = new Alternativa(cadastrarVM.AlternativasRespostas[i], false, entidade);
+                        repositorioQuestao.AdicionarAlternativa(alternativa, entidade.Id);
+                    }
+                    
+                }
                 repositorioQuestao.AtualizarAlternativa(entidade.Alternativas.FirstOrDefault(a => a.Correta)!);
                 contexto.SaveChanges();
 
@@ -105,22 +122,21 @@ namespace Gerador_de_testesWebApp.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
-        public IRepositorioMateria GetRepositorioMateria()
-        {
-            return repositorioMateria;
-        }
-
         [HttpGet("editar/{id:guid}")]
         public ActionResult Editar(Guid id)
         {
             var registroSelecionado = repositorioQuestao.SelecionarRegistroPorId(id);
+            List<string> lista = new List<string>();
+            foreach (var item in registroSelecionado.Alternativas)
+            {
+                lista.Add(item.Resposta);
+            }
 
             var editarVM = new EditarQuestaoViewModel(
                 id,
                 registroSelecionado!.Enunciado,
-                registroSelecionado.Materia,
-                registroSelecionado.Alternativas
+                lista
+
             );
 
             //editarVM.MateriasDisponiveis = repositorioMateria.SelecionarRegistros();
@@ -211,20 +227,6 @@ namespace Gerador_de_testesWebApp.Controllers
             var detalhesVM = new DetalhesQuestaoViewModel(registroSelecionado.Id, registroSelecionado.Enunciado, registroSelecionado.Materia, registroSelecionado.Alternativas);
 
             return View(detalhesVM);
-        }
-        [HttpPost, Route("/questoes/adicionar-alternativa")]
-        public IActionResult AdicionarAlternativa(Guid id, AlternativaQuestaoViewModel alternativaVM)
-        {
-            var QuestaoSelecionada = repositorioQuestao.SelecionarRegistroPorId(id);
-
-            if (QuestaoSelecionada is null)
-                return RedirectToAction(nameof(Index));
-            var alternativa = repositorioQuestao.SelecionarAlternativa(alternativaVM.Id);
-            repositorioQuestao.AdicionarAlternativa(alternativa, id);
-
-            var gerenciarAlternativasViewModel = new GerenciarAlternativasViewModel(QuestaoSelecionada);
-
-            return View(nameof(Cadastrar), gerenciarAlternativasViewModel);
         }
     }
 }

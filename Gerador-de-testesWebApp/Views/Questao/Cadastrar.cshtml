@@ -5,28 +5,6 @@
     Layout = "_Layout";
     ViewBag.Titulo = "Cadastro de Questão";
 }
-<style>
-    .card {
-        padding: 10px;
-        margin: 10px 0;
-        border: 2px solid #ccc;
-        border-radius: 8px;
-        background-color: #f2f2f2;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-        .card.correta {
-            background-color: #d4edda;
-            border-color: #28a745;
-        }
-
-        .card.errada {
-            background-color: #f8d7da;
-            border-color: #dc3545;
-        }
-</style>
 <hr />
 <div class="row justify-content-center my-5">
     <div class="col-md-8">
@@ -50,20 +28,17 @@
                         <span asp-validation-for="NomeMateria" class="text-danger"></span>
                     </div>
 
-                    <h4 class="my-3">Alternativas</h4>
+                    <h4>Alternativas</h4>
 
-                    <form class="d-flex flex-wrap gap-2 align-items-center" action="/questoes/adicionar-alternativa" method="post">
-                        <div class="col">
-                            <label class="control-label">Resposta da Alternativa: </label>
-                            <input name="Resposta" class="form-control w-100" />
-                        </div>
+                    <div id="alternativas-container">
+                       
+                    </div>
 
-                        <button type="submit" class="btn btn-outline-primary align-self-end col-lg-2">
-                            Adicionar
-                        </button>
-                    </form>
 
-                    <span asp-validation-for="Alternativas" class="text-danger"></span>
+                    <button type="button" id="adicionar-alternativa-btn" class="btn btn-outline-primary mt-2">Adicionar Alternativa</button>
+
+                    <span asp-validation-for="AlternativasRespostas" class="text-danger"></span>
+                    <span asp-validation-for="AlternativaCorretaIndice" class="text-danger"></span>
 
                     <div class="form-group d-flex align-items-center justify-content-end mt-5 gap-3">
                         <a href="/questoes">Voltar para a listagem</a>
@@ -77,5 +52,85 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const container = document.getElementById('alternativas-container');
+          const btnAdicionar = document.getElementById('adicionar-alternativa-btn');
+          const maxAlternativas = 5;
 
+          function reindexarAlternativas() {
+            const items = container.querySelectorAll('.alternativa-item');
+            items.forEach((item, index) => {
+              const input = item.querySelector('input[type="text"]');
+              const radio = item.querySelector('input[type="radio"]');
+
+              input.name = `AlternativasRespostas[${index}]`;
+              radio.value = index;
+            });
+          }
+
+          function criarAlternativa(index) {
+            const div = document.createElement('div');
+            div.className = 'alternativa-item mb-2 p-3 border border-secondary rounded d-flex align-items-center justify-content-between gap-3';
+
+            div.innerHTML = `
+              <div class="flex-grow-1">
+                <input type="text" class="form-control mb-2" placeholder="Resposta da Alternativa" />
+                <div class="form-check">
+                  <input type="radio" name="AlternativaCorretaIndice" class="form-check-input radio-correta" />
+                  <label class="form-check-label">Correta</label>
+                </div>
+              </div>
+              <button type="button" class="btn btn-danger btn-sm btn-remover" title="Remover alternativa">
+                <i class="bi bi-trash"></i>
+              </button>
+            `;
+
+            return div;
+          }
+
+          btnAdicionar.addEventListener('click', () => {
+            const total = container.querySelectorAll('.alternativa-item').length;
+            if (total >= maxAlternativas) {
+              alert('Máximo de 5 alternativas.');
+              return;
+            }
+
+            const novaAlternativa = criarAlternativa(total);
+            container.appendChild(novaAlternativa);
+            reindexarAlternativas();
+          });
+
+          container.addEventListener('click', (event) => {
+            if (event.target.closest('.btn-remover')) {
+              const item = event.target.closest('.alternativa-item');
+              if (item) {
+                item.remove();
+                reindexarAlternativas();
+              }
+            }
+          });
+
+          container.addEventListener('change', (event) => {
+            if (event.target.classList.contains('radio-correta')) {
+              const radios = container.querySelectorAll('.radio-correta');
+              radios.forEach((radio) => {
+                const item = radio.closest('.alternativa-item');
+                if (radio.checked) {
+                  item.classList.remove('border-secondary', 'border-danger');
+                  item.classList.add('border-success');
+                } else {
+                  item.classList.remove('border-success');
+                  item.classList.add('border-secondary');
+                }
+              });
+            }
+          });
+          for (let i = 0; i < 2; i++) {
+            const alternativa = criarAlternativa(i);
+            container.appendChild(alternativa);
+          }
+          reindexarAlternativas();
+        });
+    </script>
 }

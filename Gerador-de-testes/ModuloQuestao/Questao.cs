@@ -11,15 +11,12 @@ public class Questao : EntidadeBase<Questao>
 
     public Questao()
     {
-        Materia = new Materia();
         List<Alternativa> alternativas = new List<Alternativa>();
     }
-    public Questao(string enunciado, Materia materia, List<Alternativa> alternativas) : this()
+    public Questao(string enunciado) : this()
     {
         Id = Guid.NewGuid();
         Enunciado = enunciado;
-        Alternativas = alternativas;
-        Materia = materia;
     }
     public override void AtualizarRegistro(Questao registroEditado)
     {

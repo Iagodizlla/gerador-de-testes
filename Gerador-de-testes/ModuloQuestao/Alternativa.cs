@@ -19,7 +19,7 @@ namespace Gerador_de_testes.ModuloQuestao
             Id = Guid.NewGuid();
             Resposta = resposta;
             Correta = correta;
-            Questao = questao;
+            Questao = new Questao();
         }
     }
    
