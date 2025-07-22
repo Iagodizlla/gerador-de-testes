@@ -1,6 +1,6 @@
-﻿@{
-    Layout = "_Layout";
-    ViewBag.Titulo = "Visualização de Testes";
+﻿﻿@{
+Layout = "_Layout";
+ViewBag.Titulo = "Visualização de Testes";
 }
 
 <p>
@@ -18,15 +18,9 @@
         <div class="col-12 col-md-3">
             <div class="card border-0">
                 <div class="card-body">
-                    <h5 class="card-title">@item.Titulo</h5>
-                    <p class="card-text">
-                        Matéria: @item.Materia <br />
-                        Criado em: @item.DataCriacao.ToString("dd/MM/yyyy")
-                    </p>
+                    <h5 class="card-title">Teste: @item.Titulo</h5>
+
                     <span class="d-flex justify-content-end mt-4 gap-1">
-                        <a href="/testes/realizar/@item.Id" class="btn btn-success rounded-circle opcao-card" title="Ir para o Teste">
-                            <i class="bi bi-play-circle"></i>
-                        </a>
                         <a href="/testes/editar/@item.Id" class="btn btn-primary rounded-circle opcao-card">
                             <i class="bi bi-pencil-square"></i>
                         </a>
@@ -39,7 +33,3 @@
         </div>
     }
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

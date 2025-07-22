@@ -12,7 +12,7 @@
     <div class="col-md-8">
         <div class="card rounded-4 border-0">
             <div class="card-body p-md-5">
-                <form id="form-cadastro-teste">
+                <form asp-action="Cadastrar" method="post">
                     <h3>Formulário de Cadastro</h3>
                     <div>
                         <p class="mt-4">Preencha os campos abaixo para cadastrar um novo Teste.</p>
@@ -57,7 +57,7 @@
                     
                     <div class="form-group d-flex align-items-center justify-content-end mt-5 gap-3">
                         <a asp-controller="Testes" asp-action="Index" class="btn btn-link">Voltar para a listagem</a>
-                        <button type="button" id="btn-gerar" class="btn btn-primary rounded-3 px-5">Gerar Teste</button>
+                        <button type="submit" id="btn-gerar" class="btn btn-primary rounded-3 px-5">Gerar Teste</button>
                     </div>
                 </form>
 

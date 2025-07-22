@@ -21,6 +21,9 @@ namespace Gerador_de_testes.Infraestrutura.Orm.ModuloDeTestes
                 .HasMaxLength(50)
                 .IsRequired();
 
+            builder.HasMany(x => x.Disciplinas)
+                .WithMany();
+
             builder.HasMany(x => x.Materias)
                 .WithMany();
 

@@ -71,14 +71,6 @@ namespace Gerador_de_testesWebApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Cadastrar(CadastrarTesteViewModel cadastrarVM)
         {
-            if (!ModelState.IsValid)
-            {
-                var disciplinas = repositorioDisciplinas.SelecionarRegistros();
-                var materias = repositorioMaterias.SelecionarRegistros();
-                cadastrarVM.DisciplinasDisponiveis = disciplinas.Select(d => new SelectListItem(d.Nome, d.Id.ToString())).ToList();
-                cadastrarVM.MateriasDisponiveis = materias.Select(m => new SelectListItem(m.Nome, m.Id.ToString())).ToList();
-                return View(cadastrarVM);
-            }
 
             var disciplina = repositorioDisciplinas.SelecionarRegistroPorId(cadastrarVM.DisciplinaId);
             var materia = repositorioMaterias.SelecionarRegistroPorId(cadastrarVM.MateriaId);

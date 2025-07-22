@@ -65,9 +65,9 @@ namespace Gerador_de_testesWebApp.Models
         public List<SelectListItem> DisciplinasDisponiveis { get; internal set; }
         public List<SelectListItem> MateriasDisponiveis { get; internal set; }
 
-        private Teste teste;
-        private List<Disciplina> disciplinas;
-        private List<Materia> materias;
+        public Teste teste;
+        public List<Disciplina> disciplinas;
+        public List<Materia> materias;
 
         public EditarTesteViewModel(Teste teste, List<Disciplina> disciplinas, List<Materia> materias)
         {
