@@ -1,5 +1,35 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model GerenciarAlternativasViewModel
+
 @{
+    Layout = "_Layout";
+    ViewBag.Titulo = "Alternativas da Questão";
 }
+<div class="row justify-content-center my-5">
+    <div class="col-md-8">
+        <div class="card rounded-4 border-0">
+            <div class="card-body p-md-5">
+                <h4 class="text-center mb-4">@Model.Questao.Enunciado</h4>
+
+                <div class="list-group">
+                    @foreach (var alternativa in Model.Questao.Alternativas)
+                    {
+                        <div class="list-group-item d-flex justify-content-between align-items-center @(alternativa.Correta ? "border-success" : "")" style="border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;">
+                            <span>@alternativa.Resposta</span>
+
+                            @if (alternativa.Correta)
+                            {
+                                <span class="badge bg-success">Correta</span>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="/questoes" class="btn btn-secondary">Voltar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

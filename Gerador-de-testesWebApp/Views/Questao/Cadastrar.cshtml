@@ -23,7 +23,7 @@
                     <div class="form-group d-grid mt-3 gap-2">
                         <label asp-for="NomeMateria" class="control-label fs-5">Matéria:</label>
                         <select asp-for="NomeMateria" asp-items="Model.MateriasDisponiveis" class="form-control">
-                            <option value="">-- Selecione uma matéria --</option>
+                            <option value=""> Selecione uma matéria </option>
                         </select>
                         <span asp-validation-for="NomeMateria" class="text-danger"></span>
                     </div>

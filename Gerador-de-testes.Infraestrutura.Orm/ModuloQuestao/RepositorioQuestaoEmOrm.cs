@@ -11,6 +11,13 @@ namespace Gerador_de_testes.Infraestrutura.Orm.ModuloGestao
         {
             registros = contextoDados.Set<Questao>();
         }
+        public override Questao? SelecionarRegistroPorId(Guid idRegistro)
+        {
+            return registros
+            .Include(q => q.Materia)
+            .Include(q => q.Alternativas)
+            .FirstOrDefault(x => x.Id == idRegistro);
+        }
         public void AdicionarAlternativa(Alternativa alternativa, Guid IdQuestao)
         {
             var registro = SelecionarRegistroPorId(IdQuestao)!;
