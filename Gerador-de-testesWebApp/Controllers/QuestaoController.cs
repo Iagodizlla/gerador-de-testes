@@ -94,21 +94,21 @@ namespace Gerador_de_testesWebApp.Controllers
             {
                 repositorioQuestao.CadastrarRegistro(entidade);
                 entidade.Materia = materias.FirstOrDefault(m => m.Nome == cadastrarVM.NomeMateria)!;
+                entidade.Alternativas = new List<Alternativa>();
                 for (int i = 0; i < cadastrarVM.AlternativasRespostas!.Count; i++)
                 {
                     if (i == cadastrarVM.AlternativaCorretaIndice)
                     {
                         Alternativa alternativa = new Alternativa(cadastrarVM.AlternativasRespostas[i], true, entidade);
-                        repositorioQuestao.AdicionarAlternativa(alternativa, entidade.Id);
+                        entidade.Alternativas.Add(alternativa);
                     }
                     else
                     {
                         Alternativa alternativa = new Alternativa(cadastrarVM.AlternativasRespostas[i], false, entidade);
-                        repositorioQuestao.AdicionarAlternativa(alternativa, entidade.Id);
+                        entidade.Alternativas.Add(alternativa);
                     }
                     
                 }
-                repositorioQuestao.AtualizarAlternativa(entidade.Alternativas.FirstOrDefault(a => a.Correta)!);
                 contexto.SaveChanges();
 
                 transacao.Commit();

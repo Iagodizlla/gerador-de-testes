@@ -19,7 +19,7 @@ ViewBag.Titulo = "Visualização de Questões";
             <div class="card border-0">
                 <div class="card-body">
                     <h5 class="card-title">Enunciado: @item.Enunciado</h5>
-                    <h5 class="card-title">Matéria: @item.Materia</h5>
+                    <h5 class="card-title">Matéria: @item.Materia.Nome</h5>
 
                     <span class="d-flex justify-content-end mt-4 gap-1">
                         <a href="/questoes/editar/@item.Id" class="btn btn-primary rounded-circle opcao-card">
