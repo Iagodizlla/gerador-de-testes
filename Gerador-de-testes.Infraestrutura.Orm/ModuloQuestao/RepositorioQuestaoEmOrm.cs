@@ -54,5 +54,10 @@ namespace Gerador_de_testes.Infraestrutura.Orm.ModuloGestao
         {
             return questao.Alternativas;
         }
+
+        public virtual List<Questao> SelecionarRegistros()
+        {
+            return registros.Include(x => x.Materia).ToList();
+        }
     }
 }
