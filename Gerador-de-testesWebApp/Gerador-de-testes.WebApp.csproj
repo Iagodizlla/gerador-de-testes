@@ -30,8 +30,4 @@
     <ProjectReference Include="..\Gerador-de-testes\Gerador-de-testes.Dominio.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\images\" />
-  </ItemGroup>
-
 </Project>
