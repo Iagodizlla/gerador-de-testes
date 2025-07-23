@@ -128,16 +128,18 @@ namespace Gerador_de_testesWebApp.Controllers
         public IActionResult Excluir(Guid id, ExcluirTesteViewModel excluirVM)
         {
             var registroSelecionado = repositorioTestes.SelecionarRegistroPorId(id);
-            excluirVM = new ExcluirTesteViewModel(registroSelecionado.Titulo);
 
             if (registroSelecionado == null)
             {
-                ModelState.AddModelError("RegistroNaoEncontrado", "Teste não encontrado.");
+                TempData["Erro"] = "Teste não encontrado.";
                 return RedirectToAction(nameof(Index));
             }
 
+            excluirVM = new ExcluirTesteViewModel(registroSelecionado.Id, registroSelecionado.Titulo);
+
             return View(excluirVM);
         }
+
 
         [HttpPost("excluir/{id:guid}")]
         [ValidateAntiForgeryToken]

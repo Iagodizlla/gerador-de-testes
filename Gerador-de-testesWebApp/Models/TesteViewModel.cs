@@ -61,8 +61,12 @@ namespace Gerador_de_testesWebApp.Models
         public Guid Id { get; set; }
         public string Titulo { get; set; }
 
-        public ExcluirTesteViewModel(string titulo)
+        // Construtor padrão (sem parâmetros) obrigatório para model binding
+        public ExcluirTesteViewModel() { }
+
+        public ExcluirTesteViewModel(Guid id, string titulo) : this()
         {
+            Id = id;
             Titulo = titulo;
         }
     }
