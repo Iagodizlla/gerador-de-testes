@@ -146,6 +146,15 @@ public class DisciplinaController : Controller
             return RedirectToAction(nameof(Index));
         }
 
+        // Verifica se a disciplina possui testes associados
+        var possuiTestesAssociados = contexto.Testes.Any(t => t.Disciplinas.Any(d => d.Id == id));
+
+        if (possuiTestesAssociados)
+        {
+            ModelState.AddModelError("ExclusaoInvalida", "Não é possível excluir uma disciplina que possui testes associadas.");
+            return RedirectToAction(nameof(Index));
+        }
+
         var transacao = contexto.Database.BeginTransaction();
 
         try
