@@ -186,6 +186,14 @@ public class MateriaController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult ExcluirConfirmado(Guid id)
     {
+        var possuiQAssociados = contexto.Questoes.Any(q => q.Materia.Id == id);
+
+        if (possuiQAssociados)
+        {
+            ModelState.AddModelError("ExclusaoInvalida", "Não é possível excluir uma materia que possui questoes associados.");
+            return RedirectToAction(nameof(Index));
+        }
+
         var registroSelecionado = repositorioMateria.SelecionarRegistroPorId(id);
 
         if (registroSelecionado is null)
