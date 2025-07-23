@@ -233,6 +233,14 @@ namespace Gerador_de_testesWebApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ExcluirConfirmado(Guid id)
         {
+            var possuiTestesAssociados = contexto.Testes.Any(q => q.QuestoesSelecionadas.Any(d => d.Id == id));
+
+            if (possuiTestesAssociados)
+            {
+                ModelState.AddModelError("ExclusaoInvalida", "Não é possível excluir uma Questao que possui testes associados.");
+                return RedirectToAction(nameof(Index));
+            }
+
             var registroSelecionado = repositorioQuestao.SelecionarRegistroPorId(id);
             var registrosTeste = repositorioTeste.SelecionarRegistros();
             foreach (var registro in registrosTeste)
