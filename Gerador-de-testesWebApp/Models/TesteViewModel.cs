@@ -11,23 +11,22 @@ namespace Gerador_de_testesWebApp.Models;
 public class FormularioTesteViewModel
 {
     [Required(ErrorMessage = "O campo \"Título\" é obrigatório.")]
-    [StringLength(100, ErrorMessage = "O título deve ter no máximo 100 caracteres.")]
+    [MinLength(2, ErrorMessage = "O título deve ter pelo menos 2 caracteres.")]
+    [MaxLength(100, ErrorMessage = "O título deve ter no máximo 100 caracteres.")]
     public string Titulo { get; set; }
 
     [Required(ErrorMessage = "O campo \"Série\" é obrigatório.")]
+    [MinLength(2, ErrorMessage = "A série deve ter pelo menos 2 caracteres.")]
     [StringLength(50, ErrorMessage = "A série deve ter no máximo 50 caracteres.")]
     public string Serie { get; set; }
 
     [Required(ErrorMessage = "O campo \"Quantidade de Questões\" é obrigatório.")]
     [Range(1, int.MaxValue, ErrorMessage = "A quantidade de questões deve ser pelo menos 1.")]
     public int QteQuestoes { get; set; }
-
     public Guid DisciplinaId { get; set; }
     public List<SelectListItem> Disciplinas { get; set; }
-
     public Guid MateriaId { get; set; }
     public List<SelectListItem> Materias { get; set; }
-
     public List<Questao> QuestoesSelecionadas { get; set; }
 }
 
