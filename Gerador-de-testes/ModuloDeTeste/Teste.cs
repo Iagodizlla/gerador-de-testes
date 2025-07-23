@@ -31,6 +31,7 @@ namespace Gerador_de_testes.ModuloDeTestes
 
         public Teste(string titulo, List<Disciplina> disciplina, string serie, List<Materia> materias, int qteQuestoes, List<Questao> questoesSelecionadas) : this()
         {
+            Id = Guid.NewGuid();
             Titulo = titulo;
             Disciplinas = disciplina;
             Serie = serie;
@@ -38,6 +39,7 @@ namespace Gerador_de_testes.ModuloDeTestes
             QteQuestoes = qteQuestoes;
             QuestoesSelecionadas = questoesSelecionadas;
         }
+
 
         public override void AtualizarRegistro(Teste registroEditado)
         {

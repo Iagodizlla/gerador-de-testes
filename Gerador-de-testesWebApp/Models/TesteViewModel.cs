@@ -56,62 +56,6 @@ namespace Gerador_de_testesWebApp.Models
         }
     }
 
-    public class EditarTesteViewModel : FormularioTesteViewModel
-    {
-
-        public Guid Id { get; set; }
-        public Guid DisciplinaId { get; set; }
-        public Guid MateriaId { get; set; }
-        public List<SelectListItem> DisciplinasDisponiveis { get; internal set; }
-        public List<SelectListItem> MateriasDisponiveis { get; internal set; }
-
-        public Teste teste;
-        public List<Disciplina> disciplinas;
-        public List<Materia> materias;
-
-        public EditarTesteViewModel(Teste teste, List<Disciplina> disciplinas, List<Materia> materias)
-        {
-            this.teste = teste;
-            this.disciplinas = disciplinas;
-            this.materias = materias;
-        }
-        public EditarTesteViewModel()
-        {
-            Disciplinas = new List<SelectListItem>();
-            Materias = new List<SelectListItem>();
-        }
-
-        public EditarTesteViewModel(
-                Guid id,
-                string titulo,
-                string serie,
-                int qteQuestoes,
-                List<Disciplina> disciplinas,
-                List<Materia> materias,
-                List<Questao> questoesSelecionadas
-                ): this()
-        {
-            Id = id;
-            Titulo = titulo;
-            Serie = serie;
-            QteQuestoes = qteQuestoes;
-            Disciplinas = new List<SelectListItem>();
-            foreach (var d in disciplinas)
-            {
-                var selecionarVM = new SelectListItem(d.Nome, d.Id.ToString());
-                Disciplinas.Add(selecionarVM);
-            }
-            Materias = new List<SelectListItem>();
-            foreach (var m in materias)
-            {
-                var selecionarVM = new SelectListItem(m.Nome, m.Id.ToString());
-                Materias.Add(selecionarVM);
-            }
-            QuestoesSelecionadas = questoesSelecionadas;
-        }
-    }
-
-
     public class ExcluirTesteViewModel
     {
         public Guid Id { get; set; }

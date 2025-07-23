@@ -5,9 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gerador_de_testes.ModuloDeTestes
-{
-    public interface IRepositorioTeste : IRepositorio<Teste>
-    {
-    }
-}
+namespace Gerador_de_testes.ModuloDeTestes;
+
+public interface IRepositorioTeste : IRepositorio<Teste>;
