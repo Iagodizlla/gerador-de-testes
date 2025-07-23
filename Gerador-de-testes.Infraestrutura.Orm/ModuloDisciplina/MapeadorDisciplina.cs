@@ -17,6 +17,7 @@ public class MapeadorDisciplina : IEntityTypeConfiguration<Disciplina>
             .HasMaxLength(100);
 
         builder.HasMany(x => x.Materias)
-            .WithOne(d => d.Disciplina);
+       .WithOne(d => d.Disciplina)
+       .OnDelete(DeleteBehavior.Restrict);
     }
 }

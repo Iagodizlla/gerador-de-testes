@@ -13,41 +13,7 @@ public class RepositorioMateriaEmOrm : RepositorioBaseEmOrm<Materia>, IRepositor
         this.registros = contextoDados.Set<Materia>();
     }
 
-    public void CadastrarRegistro(Materia novoRegistro)
-    {
-        registros.Add(novoRegistro);
-    }
-
-    public bool EditarRegistro(Guid idRegistro, Materia registroEditado)
-    {
-        var registroSelecionado = SelecionarRegistroPorId(idRegistro);
-
-        if (registroSelecionado is null)
-            return false;
-
-        registroSelecionado.AtualizarRegistro(registroEditado);
-
-        return true;
-    }
-
-    public bool ExcluirRegistro(Guid idRegistro)
-    {
-        var registroSelecionado = SelecionarRegistroPorId(idRegistro);
-
-        if (registroSelecionado is null)
-            return false;
-
-        registros.Remove(registroSelecionado);
-
-        return true;
-    }
-
-    public virtual Materia? SelecionarRegistroPorId(Guid idRegistro)
-    {
-        return registros.FirstOrDefault(x => x.Id.Equals(idRegistro));
-    }
-
-    public virtual List<Materia> SelecionarRegistros()
+    public override List<Materia> SelecionarRegistros()
     {
         return registros.Include(x => x.Disciplina).ToList();
     }
