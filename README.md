@@ -1,6 +1,6 @@
 # Gerador de Testes
 
-![]()
+![](https://i.imgur.com/lT7vxg1.gif)
 
 ## Introdução
 
