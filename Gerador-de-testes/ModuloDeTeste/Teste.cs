@@ -14,7 +14,6 @@ namespace Gerador_de_testes.ModuloDeTestes
     {
         private Guid disciplinaId;
         private Guid materiaId;
-
         public string Titulo { get; set; }
         public List<Disciplina> Disciplinas { get; set; }
         public List<Questao> QuestoesSelecionadas { get; set; }

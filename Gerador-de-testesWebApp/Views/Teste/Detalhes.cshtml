@@ -1,0 +1,58 @@
+﻿@using Gerador_de_testesWebApp.Models
+
+@model DetalhesTesteViewModel
+
+@{
+    Layout = "_Layout";
+    ViewBag.Titulo = "Detalhes do Teste";
+}
+
+<hr />
+<div class="row justify-content-center my-5">
+    <div class="col-md-8">
+        <div class="card rounded-4 border-0">
+            <div class="card-body p-md-5">
+                <h3>Detalhes de Teste</h3>
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label class="fs-5">Título:</label>
+                    <input class="form-control" value="@Model.Titulo" readonly disabled />
+                </div>
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <p><strong>Disciplinas:</strong></p>
+                        <ul>
+                            @foreach (var d in Model.Disciplinas)
+                            {
+                                <li>@d.Nome</li>
+                            }
+                        </ul>
+                </div>
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <p><strong>Matérias:</strong></p>
+                        <ul>
+                            @foreach (var m in Model.Materias)
+                            {
+                                <li>@m.Nome</li>
+                            }
+                        </ul>
+                </div>
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label class="fs-5">Série:</label>
+                    <input class="form-control" value="@Model.Serie" readonly disabled />
+                </div>
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label class="fs-5">Quantidade de Questões:</label>
+                    <input class="form-control" value="@Model.QteQuestoes" readonly disabled />
+                </div>
+
+                <div class="d-flex align-items-center justify-content-end mt-5 gap-3">
+                    <a asp-controller="Teste" asp-action="Index" class="btn btn-link">Voltar para a listagem</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
