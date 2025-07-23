@@ -71,6 +71,20 @@ public class TesteController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Cadastrar(CadastrarTesteViewModel cadastrarVM)
     {
+        var tituloExiste = repositorioTestes.SelecionarRegistros().Any(x => x.Titulo.Equals(cadastrarVM.Titulo, StringComparison.OrdinalIgnoreCase));
+        if (tituloExiste)
+        {
+            ModelState.AddModelError("Titulo", "Já existe um teste com este título.");
+
+            // Recarrega selects para manter os dados da tela
+            var disciplinas = repositorioDisciplinas.SelecionarRegistros();
+            var materias = repositorioMaterias.SelecionarRegistros();
+
+            cadastrarVM.DisciplinasDisponiveis = new SelectList(disciplinas, "Id", "Nome");
+            cadastrarVM.MateriasDisponiveis = new SelectList(materias, "Id", "Nome");
+
+            return View(cadastrarVM);
+        }
 
         var disciplina = repositorioDisciplinas.SelecionarRegistroPorId(cadastrarVM.DisciplinaId);
         var materia = repositorioMaterias.SelecionarRegistroPorId(cadastrarVM.MateriaId);
