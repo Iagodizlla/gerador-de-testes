@@ -168,7 +168,6 @@ public class MateriaAppService
     {
         try
         {
-            throw new NotImplementedException();
             var registros = repositorioMateria.SelecionarRegistros();
 
             return Result.Ok(registros);
