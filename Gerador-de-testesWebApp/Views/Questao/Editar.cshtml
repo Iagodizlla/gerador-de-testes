@@ -1,6 +1,7 @@
 ﻿@model EditarQuestaoViewModel
 
 @{
+    Layout = "_Layout";
     ViewBag.Titulo = "Edição de Questão";
     var alternativasOrdenadasPorLetra = Model.AlternativasSelecionadas.OrderBy(a => a.Letra).ToList();
 }
