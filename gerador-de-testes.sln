@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TesteFacil.WebApp", "Gerado
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.Apresentação", "1.Apresentação", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.Dominio", "2.Dominio", "{E9E0A3BD-332E-4115-82C4-14DB02801864}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.Nucleo", "2.Nucleo", "{E9E0A3BD-332E-4115-82C4-14DB02801864}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.Infraestrutura", "3.Infraestrutura", "{BB589B0E-AAC1-4136-9258-49F2CD39E8D5}"
 EndProject
@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TesteFacil.Dominio", "Gerad
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TesteFacil.Infraestrutura", "Gerador-de-testes.Infraestrutura.Orm\TesteFacil.Infraestrutura.csproj", "{18631FFB-24BC-469E-AC72-4F12037AEA39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TesteFacil.Aplicacao2", "TesteFacil.Aplicacao2\TesteFacil.Aplicacao2.csproj", "{2E27BA7D-5F1B-46A1-A70D-DC49A4653A1B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TesteFacil.Aplicacao", "TesteFacil.Aplicacao2\TesteFacil.Aplicacao.csproj", "{2E27BA7D-5F1B-46A1-A70D-DC49A4653A1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
