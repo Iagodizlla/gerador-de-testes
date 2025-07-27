@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Gerador-de-testes.Infraestrutura.Orm\Gerador-de-testes.Infraestrutura.Orm.csproj" />
-    <ProjectReference Include="..\Gerador-de-testes\Gerador-de-testes.Dominio.csproj" />
+    <ProjectReference Include="..\Gerador-de-testes\TesteFacil.Dominio.csproj" />
   </ItemGroup>
 
 </Project>

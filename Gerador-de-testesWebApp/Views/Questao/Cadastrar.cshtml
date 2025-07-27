@@ -1,47 +1,132 @@
-﻿﻿@using static Gerador_de_testes.WebApp.Models.FormularioQuestaoViewModel
-@model FormularioQuestaoViewModel
+﻿﻿@model CadastrarQuestaoViewModel
 
 @{
-    Layout = "_Layout";
     ViewBag.Titulo = "Cadastro de Questão";
 }
+
 <hr />
 <div class="row justify-content-center my-5">
     <div class="col-md-8">
         <div class="card rounded-4 border-0">
             <div class="card-body p-md-5">
                 <form asp-action="Cadastrar" method="post">
-                    <h3>Formulário de Cadastro</h3>
-                    <div>
-                        <p class="mt-4">Preencha o campo abaixo para cadastrar uma nova questão.</p>
-                    </div>
-                    <div class="form-group d-grid mt-3 gap-2">
+                    <h3 class="mb-4">Cadastro de Questão</h3>
+
+                    @if (ViewData.ModelState["CadastroUnico"]?.Errors.Count > 0)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+                            @ViewData.ModelState["CadastroUnico"]!.Errors.First().ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <div class="form-group d-grid gap-2 mt-3">
                         <label asp-for="Enunciado" class="control-label fs-5">Enunciado:</label>
-                        <input asp-for="Enunciado" class="form-control" value="@Model.Enunciado" />
+                        <input asp-for="Enunciado" class="form-control" type="text"/>
                         <span asp-validation-for="Enunciado" class="text-danger"></span>
                     </div>
-                    <div class="form-group d-grid mt-3 gap-2">
-                        <label asp-for="NomeMateria" class="control-label fs-5">Matéria:</label>
-                        <select asp-for="NomeMateria" asp-items="Model.MateriasDisponiveis" class="form-control">
-                            <option value=""> Selecione uma matéria </option>
-                        </select>
-                        <span asp-validation-for="NomeMateria" class="text-danger"></span>
+
+                    <div class="form-group d-grid gap-2 mt-4">
+                        <label asp-for="MateriaId" class="control-label fs-5">Matéria:</label>
+                        <select asp-for="MateriaId" asp-items="Model.MateriasDisponiveis" class="form-select"></select>
+                        <span asp-validation-for="MateriaId" class="text-danger"></span>
                     </div>
+
+                    <hr class="my-3" />
 
                     <h4>Alternativas</h4>
+                    
+                    <div class="row align-items-end g-3 mt-3">
+                        <div class="col">
+                            <label for="Resposta" class="form-label">Resposta:</label>
 
-                    <div id="alternativas-container">
-                       
+                            <div class="d-flex gap-2 align-items-center">
+                                <input type="text" name="Resposta" class="form-control" />
+
+                                <span class="d-flex gap-2">
+                                    @Html.CheckBox("Correta", false, new { @class = "form-check-input" })
+                                    <label for="Correta" class="form-check-label">Correta</label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button
+                                class="btn btn-outline-primary w-100"
+                                type="submit"
+                                formaction="/questoes/cadastrar/adicionar-alternativa">
+                                Adicionar
+                            </button>
+                        </div>
                     </div>
 
+                    @* Reenvia alternativas já adicionadas *@
+                    @for (int i = 0; i < Model.AlternativasSelecionadas.Count; i++)
+                    {
+                        <input type="hidden" asp-for="AlternativasSelecionadas[@i].Letra" />
+                        <input type="hidden" asp-for="AlternativasSelecionadas[@i].Resposta" />
+                        <input type="hidden" asp-for="AlternativasSelecionadas[@i].Correta" />
+                    }
 
-                    <button type="button" id="adicionar-alternativa-btn" class="btn btn-outline-primary mt-2">Adicionar Alternativa</button>
+                    @if (Model.AlternativasSelecionadas.Any())
+                    {
+                        <div class="table-responsive mt-4">
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Letra</th>
+                                        <th>Resposta</th>
+                                        <th>Correta</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.AlternativasSelecionadas.Count; i++)
+                                    {
+                                        <tr>
+                                            <td valign="middle" style="width: 75px;">
+                                                @Model.AlternativasSelecionadas[i].Letra)
+                                                <input
+                                                    type="hidden"
+                                                    name="AlternativasSelecionadas[@i].Letra"
+                                                    value="@Model.AlternativasSelecionadas[i].Letra" />
+                                            </td>
+                                            <td valign="middle">
+                                                @Model.AlternativasSelecionadas[i].Resposta
+                                                <input
+                                                    type="hidden"
+                                                    name="AlternativasSelecionadas[@i].Resposta"
+                                                    value="@Model.AlternativasSelecionadas[i].Resposta" />
+                                            </td>
+                                            <td valign="middle" style="width: 75px;">
+                                                @(Model.AlternativasSelecionadas[i].Correta ? "Sim" : "Não")
+                                                <input
+                                                    type="hidden"
+                                                    name="AlternativasSelecionadas[@i].Correta"
+                                                    value="@Model.AlternativasSelecionadas[i].Correta" />
+                                            </td>
+                                            <td valign="middle" align="center" style="width: 50px;">
+                                                <button
+                                                    class="btn btn-sm btn-outline-danger rounded"
+                                                    type="submit"
+                                                    formaction="/questoes/cadastrar/remover-alternativa/@Model.AlternativasSelecionadas[i].Letra">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mt-4">Nenhuma alternativa adicionada.</p>
+                    }
 
-                    <span asp-validation-for="AlternativasRespostas" class="text-danger"></span>
-                    <span asp-validation-for="AlternativaCorretaIndice" class="text-danger"></span>
+                    <hr class="my-3" />
 
-                    <div class="form-group d-flex align-items-center justify-content-end mt-5 gap-3">
-                        <a href="/questoes">Voltar para a listagem</a>
+                    <div class="form-group d-flex align-items-center justify-content-end gap-3 mt-5">
+                        <a asp-action="Index">Voltar para a listagem</a>
                         <button type="submit" class="btn btn-primary rounded-3 px-5">Confirmar</button>
                     </div>
                 </form>
@@ -52,85 +137,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const container = document.getElementById('alternativas-container');
-          const btnAdicionar = document.getElementById('adicionar-alternativa-btn');
-          const maxAlternativas = 5;
-
-          function reindexarAlternativas() {
-            const items = container.querySelectorAll('.alternativa-item');
-            items.forEach((item, index) => {
-              const input = item.querySelector('input[type="text"]');
-              const radio = item.querySelector('input[type="radio"]');
-
-              input.name = `AlternativasRespostas[${index}]`;
-              radio.value = index;
-            });
-          }
-
-          function criarAlternativa(index) {
-            const div = document.createElement('div');
-            div.className = 'alternativa-item mb-2 p-3 border border-secondary rounded d-flex align-items-center justify-content-between gap-3';
-
-            div.innerHTML = `
-              <div class="flex-grow-1">
-                <input type="text" class="form-control mb-2" placeholder="Resposta da Alternativa" />
-                <div class="form-check">
-                  <input type="radio" name="AlternativaCorretaIndice" class="form-check-input radio-correta" />
-                  <label class="form-check-label">Correta</label>
-                </div>
-              </div>
-              <button type="button" class="btn btn-danger btn-sm btn-remover" title="Remover alternativa">
-                <i class="bi bi-trash"></i>
-              </button>
-            `;
-
-            return div;
-          }
-
-          btnAdicionar.addEventListener('click', () => {
-            const total = container.querySelectorAll('.alternativa-item').length;
-            if (total >= maxAlternativas) {
-              alert('Máximo de 5 alternativas.');
-              return;
-            }
-
-            const novaAlternativa = criarAlternativa(total);
-            container.appendChild(novaAlternativa);
-            reindexarAlternativas();
-          });
-
-          container.addEventListener('click', (event) => {
-            if (event.target.closest('.btn-remover')) {
-              const item = event.target.closest('.alternativa-item');
-              if (item) {
-                item.remove();
-                reindexarAlternativas();
-              }
-            }
-          });
-
-          container.addEventListener('change', (event) => {
-            if (event.target.classList.contains('radio-correta')) {
-              const radios = container.querySelectorAll('.radio-correta');
-              radios.forEach((radio) => {
-                const item = radio.closest('.alternativa-item');
-                if (radio.checked) {
-                  item.classList.remove('border-secondary', 'border-danger');
-                  item.classList.add('border-success');
-                } else {
-                  item.classList.remove('border-success');
-                  item.classList.add('border-secondary');
-                }
-              });
-            }
-          });
-          for (let i = 0; i < 2; i++) {
-            const alternativa = criarAlternativa(i);
-            container.appendChild(alternativa);
-          }
-          reindexarAlternativas();
-        });
-    </script>
 }

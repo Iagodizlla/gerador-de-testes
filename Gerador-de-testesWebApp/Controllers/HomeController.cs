@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+using TesteFacil.WebApp.Models;
 
-namespace Gerador_de_testes.WebApp.Controllers;
+namespace TesteFacil.WebApp.Controllers;
 
 public class HomeController : Controller
 {
-    [HttpGet]
     public IActionResult Index()
     {
         return View();
@@ -13,6 +14,15 @@ public class HomeController : Controller
     [HttpGet("erro")]
     public IActionResult Erro()
     {
+        var existeNotificacao = TempData.TryGetValue(nameof(NotificacaoViewModel), out var valor);
+
+        if (existeNotificacao && valor is string jsonString)
+        {
+            var notificacaoVm = JsonSerializer.Deserialize<NotificacaoViewModel>(jsonString);
+
+            ViewData.Add(nameof(NotificacaoViewModel), notificacaoVm);
+        }
+
         return View();
     }
 }

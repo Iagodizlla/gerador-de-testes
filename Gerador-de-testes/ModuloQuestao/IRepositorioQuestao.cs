@@ -1,13 +1,11 @@
-﻿using Gerador_de_testes.Compartilhado;
+﻿using Gerador_de_testes.ModuloQuestao;
+using TesteFacil.Dominio.Compartilhado;
+using TesteFacil.Dominio.ModuloMateria;
 
-namespace Gerador_de_testes.ModuloQuestao
+namespace TesteFacil.Dominio.ModuloQuestao;
+
+public interface IRepositorioQuestao : IRepositorio<Questao>
 {
-    public interface IRepositorioQuestao : IRepositorio<Questao>
-    {
-        public void AdicionarAlternativa(Alternativa alternativa, Guid IdQuestao);
-        public bool AtualizarAlternativa(Alternativa alternativaAtualizado);
-        public bool RemoverAlternativa(Alternativa alternativa);
-        public Alternativa SelecionarAlternativa(Guid idAlternativa);
-        public List<Alternativa> SelecionarTodasAlternativasDaQuestao(Questao questao);
-    }
+    List<Questao> SelecionarQuestoesPorDisciplinaESerie(Guid disciplinaId, SerieMateria serie, int quantidadeQuestoes);
+    List<Questao> SelecionarQuestoesPorMateria(Guid materiaId, int quantidadeQuestoes);
 }

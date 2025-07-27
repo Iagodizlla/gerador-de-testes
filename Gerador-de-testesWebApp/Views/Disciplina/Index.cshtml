@@ -1,10 +1,13 @@
-﻿﻿@{
-Layout = "_Layout";
-ViewBag.Titulo = "Visualização de Disciplinas";
+﻿@model VisualizarDisciplinasViewModel
+
+@{
+    ViewBag.Titulo = "Visualização de Disciplinas";
+
+    var notificacao = ViewData[nameof(NotificacaoViewModel)] as NotificacaoViewModel;
 }
 
 <p>
-    <a class="btn btn-primary px-4" href="/disciplinas/cadastrar">
+    <a class="btn btn-primary px-4" asp-action="Cadastrar">
         <i class="bi bi-plus"></i>
         Cadastrar Novo/a
     </a>
@@ -12,19 +15,35 @@ ViewBag.Titulo = "Visualização de Disciplinas";
 
 <hr />
 
+@if (notificacao is not null)
+{
+    <div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+        <h6>@notificacao.Titulo</h6>
+        @notificacao.Mensagem
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="d-flex flex-wrap gap-2">
-    @foreach (var item in Model.Registros)
+    @foreach (var registro in Model.Registros)
     {
         <div class="col-12 col-md-3">
             <div class="card border-0">
                 <div class="card-body">
-                    <h5 class="card-title">Categoria: @item.Nome</h5>
+                    <h5 class="card-title">@registro.Nome</h5>
 
-                    <span class="d-flex justify-content-end mt-4 gap-1">
-                        <a href="/disciplinas/editar/@item.Id" class="btn btn-primary rounded-circle opcao-card">
+                    <p class="card-text mb-0">
+                        <span class="fw-semibold">Matérias:</span> @registro.Materias.Count
+                    </p>
+
+                    <span class="d-flex gap-1 justify-content-end mt-4">
+                        <a asp-action="Detalhes" asp-route-id="@registro.Id" class="btn btn-secondary rounded-circle card-option" title="Detalhes">
+                            <i class="bi bi-search"></i>
+                        </a>
+                        <a asp-action="Editar" asp-route-id="@registro.Id" class="btn btn-primary rounded-circle card-option" title="Edição">
                             <i class="bi bi-pencil-square"></i>
                         </a>
-                        <a href="/disciplinas/excluir/@item.Id" class="btn btn-danger rounded-circle opcao-card">
+                        <a asp-action="Excluir" asp-route-id="@registro.Id" class="btn btn-danger rounded-circle card-option" title="Exclusão">
                             <i class="bi bi-trash"></i>
                         </a>
                     </span>

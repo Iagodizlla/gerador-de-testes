@@ -1,25 +1,28 @@
-﻿using Gerador_de_testes.ModuloDisciplina;
-using Gerador_de_testes.ModuloQuestao;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TesteFacil.Dominio.ModuloQuestao;
 
-namespace Gerador_de_testes.Infraestrutura.Orm.ModuloGestao;
+namespace TesteFacil.Infraestrutura.Orm.ModuloQuestao;
 
-public class MapeadorQuestao : IEntityTypeConfiguration<Questao>
+public class MapeadorQuestaoEmOrm : IEntityTypeConfiguration<Questao>
 {
     public void Configure(EntityTypeBuilder<Questao> builder)
     {
-        builder.Property(x => x.Id)
+        builder.Property(q => q.Id)
             .ValueGeneratedNever()
             .IsRequired();
 
-        builder.Property(x => x.Enunciado)
-            .IsRequired()
-            .HasMaxLength(500);
+        builder.Property(q => q.Enunciado)
+            .HasMaxLength(500)
+            .IsRequired();
+
+        builder.Property(q => q.UtilizadaEmTeste)
+            .IsRequired();
 
         builder.HasOne(q => q.Materia)
-            .WithMany(m => m.Questoes);
-            
+            .WithMany(m => m.Questoes)
+            .IsRequired();
+
         builder.HasMany(q => q.Alternativas)
             .WithOne(a => a.Questao);
     }

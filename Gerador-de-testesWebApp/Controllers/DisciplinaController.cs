@@ -1,29 +1,57 @@
-﻿using Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
-using Gerador_de_testes.ModuloDisciplina;
-using Gerador_de_testes.WebApp.Extensions;
-using Gerador_de_testes.WebApp.Models;
+﻿using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text.Json;
+using TesteFacil.Aplicacao.ModuloDisciplina;
+using TesteFacil.Dominio.ModuloDisciplina;
+using TesteFacil.WebApp.Extensions;
+using TesteFacil.WebApp.Models;
 
-namespace Gerador_de_testes.WebApp.Controllers;
+namespace TesteFacil.WebApp.Controllers;
 
 [Route("disciplinas")]
 public class DisciplinaController : Controller
 {
-    private readonly GeradorDeTestesDbContext contexto;
-    private readonly IRepositorioDisciplina repositorioDisciplina;
+    private readonly DisciplinaAppService disciplinaAppService;
 
-    public DisciplinaController(GeradorDeTestesDbContext contexto, IRepositorioDisciplina repositorioDisciplina)
+    public DisciplinaController(DisciplinaAppService disciplinaAppService)
     {
-        this.contexto = contexto;
-        this.repositorioDisciplina = repositorioDisciplina;
+        this.disciplinaAppService = disciplinaAppService;
     }
 
     [HttpGet]
     public IActionResult Index()
     {
-        var registros = repositorioDisciplina.SelecionarRegistros();
+        var resultado = disciplinaAppService.SelecionarTodos();
+
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
+            return RedirectToAction("erro", "home");
+        }
+
+        var registros = resultado.Value;
 
         var visualizarVM = new VisualizarDisciplinasViewModel(registros);
+
+        var existeNotificacao = TempData.TryGetValue(nameof(NotificacaoViewModel), out var valor);
+
+        if (existeNotificacao && valor is string jsonString)
+        {
+            var notificacaoVm = JsonSerializer.Deserialize<NotificacaoViewModel>(jsonString);
+
+            ViewData.Add(nameof(NotificacaoViewModel), notificacaoVm);
+        }
 
         return View(visualizarVM);
     }
@@ -40,43 +68,49 @@ public class DisciplinaController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Cadastrar(CadastrarDisciplinaViewModel cadastrarVM)
     {
-        var registros = repositorioDisciplina.SelecionarRegistros();
+        var entidade = FormularioDisciplinaViewModel.ParaEntidade(cadastrarVM);
 
-        foreach (var item in registros)
+        var resultado = disciplinaAppService.Cadastrar(entidade);
+
+        if (resultado.IsFailed)
         {
-            if (item.Nome.Equals(cadastrarVM.Nome))
+            foreach (var erro in resultado.Errors)
             {
-                ModelState.AddModelError("CadastroUnico", "Já existe uma disciplina registrada com este nome.");
-                return View(cadastrarVM);
+                if (erro.Metadata["TipoErro"].ToString() == "RegistroDuplicado")
+                {
+                    ModelState.AddModelError("CadastroUnico", erro.Reasons[0].Message);
+                    break;
+                }
             }
-        }
 
-        var entidade = cadastrarVM.ParaEntidade();
-
-        var transacao = contexto.Database.BeginTransaction();
-
-        try
-        {
-            repositorioDisciplina.CadastrarRegistro(entidade);
-
-            contexto.SaveChanges();
-
-            transacao.Commit();
-        }
-        catch (Exception)
-        {
-            transacao.Rollback();
-
-            throw;
+            return View(cadastrarVM);
         }
 
         return RedirectToAction(nameof(Index));
     }
 
     [HttpGet("editar/{id:guid}")]
-    public ActionResult Editar(Guid id)
+    public IActionResult Editar(Guid id)
     {
-        var registroSelecionado = repositorioDisciplina.SelecionarRegistroPorId(id);
+        var resultado = disciplinaAppService.SelecionarPorId(id);
+
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        var registroSelecionado = resultado.Value;
 
         var editarVM = new EditarDisciplinaViewModel(
             id,
@@ -88,37 +122,24 @@ public class DisciplinaController : Controller
 
     [HttpPost("editar/{id:guid}")]
     [ValidateAntiForgeryToken]
-    public ActionResult Editar(Guid id, EditarDisciplinaViewModel editarVM)
+    public IActionResult Editar(Guid id, EditarDisciplinaViewModel editarVM)
     {
-        var registros = repositorioDisciplina.SelecionarRegistros();
+        var entidadeEditada = FormularioDisciplinaViewModel.ParaEntidade(editarVM);
 
-        foreach (var item in registros)
+        var resultado = disciplinaAppService.Editar(id, entidadeEditada);
+
+        if (resultado.IsFailed)
         {
-            if (!item.Id.Equals(id) && item.Nome.Equals(editarVM.Nome))
+            foreach (var erro in resultado.Errors)
             {
-                ModelState.AddModelError("CadastroUnico", "Já existe uma disciplina registrada com este nome.");
-                return View(editarVM);
-
+                if (erro.Metadata["TipoErro"].ToString() == "RegistroDuplicado")
+                {
+                    ModelState.AddModelError("CadastroUnico", erro.Reasons[0].Message);
+                    break;
+                }
             }
-        }
 
-        var entidadeEditada = editarVM.ParaEntidade();
-
-        var transacao = contexto.Database.BeginTransaction();
-
-        try
-        {
-            repositorioDisciplina.EditarRegistro(id, entidadeEditada);
-
-            contexto.SaveChanges();
-
-            transacao.Commit();
-        }
-        catch (Exception)
-        {
-            transacao.Rollback();
-
-            throw;
+            return View(editarVM);
         }
 
         return RedirectToAction(nameof(Index));
@@ -127,9 +148,30 @@ public class DisciplinaController : Controller
     [HttpGet("excluir/{id:guid}")]
     public IActionResult Excluir(Guid id)
     {
-        var registroSelecionado = repositorioDisciplina.SelecionarRegistroPorId(id);
+        var resultado = disciplinaAppService.SelecionarPorId(id);
 
-        var excluirVM = new ExcluirDisciplinaViewModel(registroSelecionado.Id, registroSelecionado.Nome);
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        var registroSelecionado = resultado.Value;
+
+        var excluirVM = new ExcluirDisciplinaViewModel(
+            registroSelecionado.Id,
+            registroSelecionado.Nome
+        );
 
         return View(excluirVM);
     }
@@ -138,40 +180,46 @@ public class DisciplinaController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult ExcluirConfirmado(Guid id)
     {
-        var registroSelecionado = repositorioDisciplina.SelecionarRegistroPorId(id);
+        var resultado = disciplinaAppService.Excluir(id);
 
-        if (registroSelecionado.Materias.Count > 0)
+        if (resultado.IsFailed)
         {
-            ModelState.AddModelError("ExclusaoInvalida", "Não é possível excluir uma disciplina que possui matérias associadas.");
-            return RedirectToAction(nameof(Index));
-        }
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
 
-        // Verifica se a disciplina possui testes associados
-        var possuiTestesAssociados = contexto.Testes.Any(t => t.Disciplinas.Any(d => d.Id == id));
-
-        if (possuiTestesAssociados)
-        {
-            ModelState.AddModelError("ExclusaoInvalida", "Não é possível excluir uma disciplina que possui testes associadas.");
-            return RedirectToAction(nameof(Index));
-        }
-
-        var transacao = contexto.Database.BeginTransaction();
-
-        try
-        {
-            repositorioDisciplina.ExcluirRegistro(id);
-
-            contexto.SaveChanges();
-
-            transacao.Commit();
-        }
-        catch (Exception)
-        {
-            transacao.Rollback();
-
-            throw;
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
         }
 
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet("detalhes/{id:guid}")]
+    public IActionResult Detalhes(Guid id)
+    {
+        var resultado = disciplinaAppService.SelecionarPorId(id);
+
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+        }
+
+        var detalhesVm = DetalhesDisciplinaViewModel.ParaDetalhesVm(resultado.Value);
+
+        return View(detalhesVm);
     }
 }

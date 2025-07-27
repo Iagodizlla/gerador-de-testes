@@ -1,40 +1,39 @@
-﻿@{
-    Layout = "_Layout";
-    ViewBag.Titulo = "Página Inicial";
+﻿﻿@{
+ViewBag.Titulo = "Página Inicial";
 }
 
 <hr />
-<div class="d-flex flex-wrap gap-2 gap-lg-5">
-    <div class="col order-1 order-lg-0 py-3 py-lg-5">
-        <h2 class="text-primary fs-1 fw-bold">Crie e organize avaliações com facilidade!</h2>
 
-        <p class="fs-4 mt-3">
-            O Gerador de Testes é a ferramenta ideal para professores e instituições que desejam agilidade e praticidade na criação de avaliações. Com recursos completos, ele permite gerenciar disciplinas, matérias, questões, alternativas e montar testes com gabarito de forma rápida e organizada.
-        </p>
+<div class="row flex-wrap gap-2 gap-lg-5">
+	<div class="col order-1 order-lg-0 py-3">
+		<p class="fs-4">
+			Com o Teste Fácil, você economiza tempo e garante qualidade. Crie testes personalizados em poucos cliques, compartilhe com seus alunos e acompanhe resultados em tempo real.
+		</p>
 
-        <p class="fs-4 mt-3">
-            Seja para uso em sala de aula ou avaliações online, o Gerador de Testes oferece tudo o que você precisa para otimizar sua rotina educacional.
-        </p>
+		<p class="fs-4 mt-3">
+			Chega de provas no papel ou correções manuais: modernize sua rotina e foque no que realmente importa – o aprendizado.
+		</p>
 
-        <p class="fs-4 mt-4 text-secondary-emphasis">Clique em uma das opções abaixo para prosseguir:</p>
+		<p class="fs-4 mt-4 text-secondary-emphasis">Clique em uma das opções abaixo para prosseguir:</p>
 
-        <div class="d-flex flex-wrap gap-2">
-            <div class="col col-lg-3">
-                <a href="/disciplinas" class="btn btn-outline-primary fw-semibold rounded-3 w-100">Disciplinas</a>
-            </div>
-            <div class="col col-lg-3">
-                <a href="/materias" class="btn btn-outline-primary fw-semibold rounded-3 w-100">Materias</a>
-            </div>
-            <div class="col col-lg-3">
-                <a href="/questoes" class="btn btn-outline-primary fw-semibold rounded-3 w-100">Questões</a>
-            </div>
-            <div class="col col-lg-3">
-                <a asp-controller="Teste" asp-action="Index" class="btn btn-outline-primary fw-semibold rounded-3 w-100">Testes</a>
-            </div>
-            
-        </div>
-    </div>
-    <div class="col-lg-4 order-0 order-lg-1 mx-auto">
-        <img src="~/images/Up-Arquivo.svg" alt="Imagem" class="img-fluid" style="max-width: 300px;" />
-    </div>
+		<div class="d-flex flex-wrap gap-2">
+			<div class="col col-lg-3">
+				<a href="/disciplinas" class="btn btn-outline-primary fw-semibold rounded-3 w-100">Disciplinas</a>
+			</div>
+			<div class="col col-lg-3">
+				<a href="/materias" class="btn btn-outline-primary fw-semibold rounded-3 w-100">Matérias</a>
+			</div>
+			<div class="col col-lg-3">
+				<a href="/questoes" class="btn btn-outline-primary fw-semibold rounded-3 w-100">Questões</a>
+			</div>
+			<div class="col col-lg-3">
+				<a href="/testes" class="btn btn-outline-primary fw-semibold rounded-3 w-100">Testes</a>
+			</div>
+		</div>
+
+	</div>
+	<div class="col-lg-5 order-0 order-lg-1 mx-auto text-end">
+		<img src="~/images/Up-arquivo.svg" alt="Teste online" class="img-fluid" />
+		<a class="text-decoration-none" href="https://storyset.com/people" target="_blank">Ilustrações de pessoas por <strong>Storyset</strong></a>
+	</div>
 </div>

@@ -1,23 +1,22 @@
-﻿using Gerador_de_testes.ModuloDisciplina;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TesteFacil.Dominio.ModuloDisciplina;
 
-namespace Gerador_de_testes.Infraestrutura.Orm.ModuloDisciplina;
+namespace TesteFacil.Infraestrutura.Orm.ModuloDisciplina;
 
-public class MapeadorDisciplina : IEntityTypeConfiguration<Disciplina>
+public class MapeadorDisciplinaEmOrm : IEntityTypeConfiguration<Disciplina>
 {
     public void Configure(EntityTypeBuilder<Disciplina> builder)
     {
-        builder.Property(x => x.Id)
+        builder.Property(d => d.Id)
             .ValueGeneratedNever()
             .IsRequired();
 
-        builder.Property(x => x.Nome)
-            .IsRequired()
-            .HasMaxLength(100);
+        builder.Property(d => d.Nome)
+            .HasMaxLength(100)
+            .IsRequired();
 
-        builder.HasMany(x => x.Materias)
-       .WithOne(d => d.Disciplina)
-       .OnDelete(DeleteBehavior.Restrict);
+        builder.HasMany(d => d.Materias)
+            .WithOne(m => m.Disciplina);
     }
 }

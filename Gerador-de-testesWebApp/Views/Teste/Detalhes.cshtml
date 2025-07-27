@@ -1,58 +1,91 @@
-﻿@using Gerador_de_testesWebApp.Models
+﻿﻿@using TesteFacil.Dominio.Extensions
 
 @model DetalhesTesteViewModel
 
 @{
-    Layout = "_Layout";
     ViewBag.Titulo = "Detalhes do Teste";
 }
 
 <hr />
 <div class="row justify-content-center my-5">
     <div class="col-md-8">
+
         <div class="card rounded-4 border-0">
             <div class="card-body p-md-5">
-                <h3>Detalhes de Teste</h3>
+                <h3>Detalhes</h3>
 
                 <div class="form-group d-grid gap-2 mt-3">
-                    <label class="fs-5">Título:</label>
-                    <input class="form-control" value="@Model.Titulo" readonly disabled />
+                    <label for="Título" class="control-label fs-5">Data de Geração:</label>
+                    <input name="Nome" class="form-control" value="@Model.DataGeracao" readonly disabled />
+                </div>
+
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label for="Título" class="control-label fs-5">Título:</label>
+                    <input name="Nome" class="form-control" value="@Model.Titulo" readonly disabled />
                 </div>
 
                 <div class="form-group d-grid gap-2 mt-3">
-                    <p><strong>Disciplinas:</strong></p>
-                        <ul>
-                            @foreach (var d in Model.Disciplinas)
-                            {
-                                <li>@d.Nome</li>
-                            }
-                        </ul>
+                    <label for="Disciplina" class="control-label fs-5">Disciplina:</label>
+                    <input name="Disciplina" class="form-control" value="@Model.Disciplina" readonly disabled />
+                </div>
+
+                @if (Model.Materia is not null)
+                {
+                    <div class="form-group d-grid gap-2 mt-3">
+                        <label for="Materia" class="control-label fs-5">Matéria:</label>
+                        <input name="Materia" class="form-control" value="@Model.Materia" readonly disabled />
+                    </div>
+                }
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label for="Serie" class="control-label fs-5">Série:</label>
+                    <input name="Serie" class="form-control" value="@Model.Serie" readonly disabled />
                 </div>
 
                 <div class="form-group d-grid gap-2 mt-3">
-                    <p><strong>Matérias:</strong></p>
-                        <ul>
-                            @foreach (var m in Model.Materias)
-                            {
-                                <li>@m.Nome</li>
-                            }
-                        </ul>
+                    <label for="Recuperacao" class="control-label fs-5">Recuperação:</label>
+                    <input name="Recuperacao" class="form-control" value="@Model.Recuperacao" readonly disabled />
                 </div>
 
-                <div class="form-group d-grid gap-2 mt-3">
-                    <label class="fs-5">Série:</label>
-                    <input class="form-control" value="@Model.Serie" readonly disabled />
-                </div>
+                @if (Model.QuestoesSorteadas.Count > 0)
+                {
+                    <label for="QuestoesSorteadas" class="control-label fs-5 mt-4">Questões:</label>
 
-                <div class="form-group d-grid gap-2 mt-3">
-                    <label class="fs-5">Quantidade de Questões:</label>
-                    <input class="form-control" value="@Model.QteQuestoes" readonly disabled />
-                </div>
+                    <div class="table-responsive mt-4">
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Matéria</th>
+                                    <th>Enunciado</th>
+                                    <th>Resposta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var q in Model.QuestoesSorteadas)
+                                {
+                                    <tr>
+                                        <td valign="middle" style="width: 75px;">
+                                            @q.Materia
+                                        </td>
+                                        <td valign="middle" style="width: 75px;">
+                                            @q.Enunciado
+                                        </td>
+                                        <td valign="middle" style="width: 75px;">
+                                            @q.RespostaCorreta
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
 
-                <div class="d-flex align-items-center justify-content-end mt-5 gap-3">
-                    <a asp-controller="Teste" asp-action="Index" class="btn btn-link">Voltar para a listagem</a>
+                <div class="form-group d-flex align-items-center justify-content-end gap-3 mt-5">
+                    <a asp-action="Index">Voltar para a listagem</a>
                 </div>
             </div>
         </div>
+
     </div>
 </div>

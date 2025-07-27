@@ -1,5 +1,5 @@
-﻿using Gerador_de_testes.Compartilhado;
+﻿using TesteFacil.Dominio.Compartilhado;
 
-namespace Gerador_de_testes.ModuloDisciplina;
+namespace TesteFacil.Dominio.ModuloDisciplina;
 
 public interface IRepositorioDisciplina : IRepositorio<Disciplina>;

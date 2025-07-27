@@ -2,130 +2,158 @@
 using Gerador_de_testes.ModuloDisciplina;
 using Gerador_de_testes.ModuloMateria;
 using Gerador_de_testes.ModuloQuestao;
-using Gerador_de_testesWebApp.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using TesteFacil.Dominio.Extensions;
+using TesteFacil.Dominio.ModuloDisciplina;
+using TesteFacil.Dominio.ModuloMateria;
+using TesteFacil.Dominio.ModuloQuestao;
+using TesteFacil.Dominio.ModuloTeste;
 
-namespace Gerador_de_testesWebApp.Models;
+namespace TesteFacil.WebApp.Models;
 
-public class FormularioTesteViewModel
+public class PrimeiraEtapaGerarTesteViewModel
 {
     [Required(ErrorMessage = "O campo \"Título\" é obrigatório.")]
-    [MinLength(2, ErrorMessage = "O título deve ter pelo menos 2 caracteres.")]
-    [MaxLength(100, ErrorMessage = "O título deve ter no máximo 100 caracteres.")]
+    [MinLength(2, ErrorMessage = "O campo \"Título\" precisa conter ao menos 2 caracteres.")]
+    [MaxLength(100, ErrorMessage = "O campo \"Título\" precisa conter no máximo 100 caracteres.")]
     public string Titulo { get; set; }
 
-    [Required(ErrorMessage = "O campo \"Série\" é obrigatório.")]
-    [MinLength(2, ErrorMessage = "A série deve ter pelo menos 2 caracteres.")]
-    [StringLength(50, ErrorMessage = "A série deve ter no máximo 50 caracteres.")]
-    public string Serie { get; set; }
+    [Required(ErrorMessage = "O campo \"Disciplina\" é obrigatório.")]
+    public Guid DisciplinaId { get; set; }
+    public required List<SelectListItem>? DisciplinasDisponiveis { get; set; } = new List<SelectListItem>();
+
+    [Required(ErrorMessage = "O campo \"Série da Matéria\" é obrigatório.")]
+    public SerieMateria Serie { get; set; }
+    public List<SelectListItem>? SeriesMateriasDisponiveis { get; set; } = new List<SelectListItem>();
 
     [Required(ErrorMessage = "O campo \"Quantidade de Questões\" é obrigatório.")]
-    [Range(1, int.MaxValue, ErrorMessage = "A quantidade de questões deve ser pelo menos 1.")]
-    public int QteQuestoes { get; set; }
-    public Guid DisciplinaId { get; set; }
-    public List<SelectListItem> Disciplinas { get; set; }
-    public Guid MateriaId { get; set; }
-    public List<SelectListItem> Materias { get; set; }
-    public List<Questao> QuestoesSelecionadas { get; set; }
+    [Range(1, 100, ErrorMessage = "O campo \"Quantidade de Questões\" precisa conter um valor numérico entre 1 e 100.")]
+    public int QuantidadeQuestoes { get; set; }
+
+    public bool Recuperacao { get; set; }
+
+    public static SegundaEtapaGerarTesteViewModel AvancarEtapa(
+        PrimeiraEtapaGerarTesteViewModel primeiraEtapaVm,
+        Disciplina disciplinaSelecionada,
+        List<Materia> materiasFiltradas
+    )
+    {
+        return new SegundaEtapaGerarTesteViewModel
+        {
+            Titulo = primeiraEtapaVm.Titulo ?? string.Empty,
+
+            DisciplinaId = primeiraEtapaVm.DisciplinaId,
+            Disciplina = disciplinaSelecionada.Nome,
+
+            Serie = primeiraEtapaVm.Serie,
+            NomeSerie = primeiraEtapaVm.Serie.GetDisplayName() ?? primeiraEtapaVm.Serie.ToString(),
+            QuantidadeQuestoes = primeiraEtapaVm.QuantidadeQuestoes,
+            Recuperacao = primeiraEtapaVm.Recuperacao,
+
+            MateriasDisponiveis = materiasFiltradas
+                .Select(m => new SelectListItem(m.Nome, m.Id.ToString()))
+                .ToList()
+        };
+    }
 }
 
-public class CadastrarTesteViewModel : FormularioTesteViewModel
+public class SegundaEtapaGerarTesteViewModel
 {
-    // Propriedades para o formulário
-    public new string Titulo { get; set; }
-    public new Guid DisciplinaId { get; set; }
-    public new Guid MateriaId { get; set; }
-    public new string Serie { get; set; }
-    public new int QteQuestoes { get; set; }
+    public required string Titulo { get; set; }
 
-    public IEnumerable<SelectListItem> DisciplinasDisponiveis { get; set; }
-    public IEnumerable<SelectListItem> MateriasDisponiveis { get; set; }
+    public required Guid DisciplinaId { get; set; }
+    public required string Disciplina { get; set; }
 
-    public CadastrarTesteViewModel()
+    public required SerieMateria Serie { get; set; }
+    public required string NomeSerie { get; set; }
+
+    public required int QuantidadeQuestoes { get; set; }
+    public required bool Recuperacao { get; set; }
+
+    public Guid? MateriaId { get; set; }
+    public List<SelectListItem>? MateriasDisponiveis { get; set; } = new List<SelectListItem>();
+
+    public List<DetalhesQuestaoViewModel> QuestoesSorteadas { get; set; } = new List<DetalhesQuestaoViewModel>();
+
+    public static Teste ParaEntidade(
+        SegundaEtapaGerarTesteViewModel segundaEtapaVm,
+        List<Disciplina> disciplinas,
+        List<Materia> materias,
+        List<Questao> questoes
+    )
     {
-        DisciplinasDisponiveis = new List<SelectListItem>();
-        MateriasDisponiveis = new List<SelectListItem>();
-    }
+        var disciplina = disciplinas.Find(d => d.Id.Equals(segundaEtapaVm.DisciplinaId));
 
-    public CadastrarTesteViewModel(List<Disciplina> disciplinas, List<Materia> materias) : this()
-    {
-        DisciplinasDisponiveis = disciplinas.Select(d => new SelectListItem(d.Nome, d.Id.ToString())).ToList();
-        MateriasDisponiveis = materias.Select(m => new SelectListItem(m.Nome, m.Id.ToString())).ToList();
+        if (disciplina is null)
+            throw new InvalidOperationException("A disciplina requisitada não foi encontrada no sistema.");
+
+        var materia = materias.Find(d => d.Id.Equals(segundaEtapaVm.MateriaId));
+
+        var idsQuestoesSelecionadas = segundaEtapaVm.QuestoesSorteadas
+            .Select(q => q.Id)
+            .ToHashSet();
+
+        var questoesSelecionadas = questoes
+            .Where(q => idsQuestoesSelecionadas.Contains(q.Id))
+            .ToList();
+
+        return new Teste(
+            segundaEtapaVm.Titulo,
+            segundaEtapaVm.Recuperacao,
+            segundaEtapaVm.QuantidadeQuestoes,
+            segundaEtapaVm.Serie,
+            disciplina,
+            materia,
+            questoesSelecionadas
+        );
     }
 }
 
-public class ExcluirTesteViewModel
-{
-    public Guid Id { get; set; }
-    public string Titulo { get; set; }
-
-    // Construtor padrão (sem parâmetros) obrigatório para model binding
-    public ExcluirTesteViewModel() { }
-
-    public ExcluirTesteViewModel(Guid id, string titulo) : this()
-    {
-        Id = id;
-        Titulo = titulo;
-    }
-}
-
-public class VisualizarTesteViewModel
+public class VisualizarTestesViewModel
 {
     public List<DetalhesTesteViewModel> Registros { get; set; }
 
-    public VisualizarTesteViewModel(List<Teste> testes)
+    public VisualizarTestesViewModel(List<Teste> testes)
     {
-        Registros = new List<DetalhesTesteViewModel>();
-
-        foreach (var c in testes)
-            Registros.Add(c.ParaDetalhesVM());
+        Registros = testes
+            .Select(DetalhesTesteViewModel.ParaDetalhesVm)
+            .ToList();
     }
 }
 
 public class DetalhesTesteViewModel
 {
-    public Guid Id { get; set; }
-    public string Titulo { get; set; }
-    public string Serie { get; set; }
-    public int QteQuestoes { get; set; }
-    public List<Disciplina> Disciplinas { get; set; }
-    public List<Materia> Materias { get; set; }
-    public List<Questao> QuestoesSelecionadas { get; set; }
+    public required Guid Id { get; set; }
+    public required string DataGeracao { get; set; }
+    public required string Titulo { get; set; }
+    public required string Disciplina { get; set; }
+    public required string? Materia { get; set; }
+    public required string Serie { get; set; }
+    public required string Recuperacao { get; set; }
+    public required List<DetalhesQuestaoViewModel> QuestoesSorteadas { get; set; }
 
-    public DetalhesTesteViewModel(
-        Guid id,
-        string titulo,
-        string serie,
-        int qteQuestoes,
-        List<Disciplina> disciplinas,
-        List<Materia> materias,
-        List<Questao> questoesSelecionadas)
+    public static DetalhesTesteViewModel ParaDetalhesVm(Teste teste)
     {
-        Id = id;
-        Titulo = titulo;
-        Serie = serie;
-        QteQuestoes = qteQuestoes;
-        Disciplinas = disciplinas;
-        Materias = materias;
-        QuestoesSelecionadas = questoesSelecionadas;
-    }
-
-}
-public class RealizarTesteViewModel
-{
-    public Guid TesteId { get; set; }
-    public string Titulo { get; set; }
-    public List<Questao> Questoes { get; set; }
-    public List<Guid> Respostas { get; set; } = new();
-    public List<bool> Resultados { get; set; } = new();
-
-    public RealizarTesteViewModel() { }
-    public RealizarTesteViewModel(Teste teste)
-    {
-        TesteId = teste.Id;
-        Titulo = teste.Titulo;
-        Questoes = teste.QuestoesSelecionadas;
-        Respostas = new List<Guid>(new Guid[teste.QuestoesSelecionadas.Count]);
+        return new DetalhesTesteViewModel
+        {
+            Id = teste.Id,
+            DataGeracao = teste.DataGeracao.ToShortDateString(),
+            Titulo = teste.Titulo,
+            Recuperacao = teste.Recuperacao ? "Sim" : "Não",
+            Disciplina = teste.Disciplina.Nome,
+            Materia = teste.Materia?.Nome,
+            Serie = teste.Serie.GetDisplayName() ?? teste.Serie.ToString(),
+            QuestoesSorteadas = teste.Questoes
+                .Select(q => new DetalhesQuestaoViewModel(
+                    q.Id,
+                    q.Enunciado,
+                    q.Materia.Nome,
+                    q.UtilizadaEmTeste ? "Sim" : "Não",
+                    q.AlternativaCorreta?.Resposta ?? string.Empty,
+                    q.Alternativas
+                ))
+                .ToList()
+        };
     }
 }

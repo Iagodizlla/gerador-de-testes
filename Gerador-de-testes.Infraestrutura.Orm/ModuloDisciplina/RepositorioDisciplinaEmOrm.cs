@@ -1,19 +1,26 @@
-﻿using Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
-using Gerador_de_testes.ModuloDisciplina;
-using Gerador_de_testes.ModuloMateria;
-using Microsoft.EntityFrameworkCore;
-namespace Gerador_de_testes.Infraestrutura.Orm.ModuloDisciplina;
+﻿using Microsoft.EntityFrameworkCore;
+using TesteFacil.Dominio.ModuloDisciplina;
+using TesteFacil.Infraestrutura.Orm.Compartilhado;
+
+namespace TesteFacil.Infraestrutura.Orm.ModuloDisciplina;
 
 public class RepositorioDisciplinaEmOrm : RepositorioBaseEmOrm<Disciplina>, IRepositorioDisciplina
 {
-    private readonly DbSet<Disciplina> registros;
-    public RepositorioDisciplinaEmOrm(GeradorDeTestesDbContext contextoDados) : base(contextoDados)
+    public RepositorioDisciplinaEmOrm(TesteFacilDbContext contexto) : base(contexto)
     {
-        this.registros = contextoDados.Set<Disciplina>();
     }
 
-    public override Disciplina SelecionarRegistroPorId(Guid id)
+    public override Disciplina? SelecionarRegistroPorId(Guid idRegistro)
     {
-        return registros.Include(d => d.Materias).FirstOrDefault(d => d.Id == id);
+        return registros
+            .Include(x => x.Materias)
+            .FirstOrDefault(x => x.Id.Equals(idRegistro));
+    }
+
+    public override List<Disciplina> SelecionarRegistros()
+    {
+        return registros
+            .Include(x => x.Materias)
+            .ToList();
     }
 }

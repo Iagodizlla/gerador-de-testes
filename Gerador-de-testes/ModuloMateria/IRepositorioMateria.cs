@@ -1,5 +1,6 @@
-﻿using Gerador_de_testes.Compartilhado;
+﻿using Gerador_de_testes.ModuloMateria;
+using TesteFacil.Dominio.Compartilhado;
 
-namespace Gerador_de_testes.ModuloMateria;
+namespace TesteFacil.Dominio.ModuloMateria;
 
 public interface IRepositorioMateria : IRepositorio<Materia>;

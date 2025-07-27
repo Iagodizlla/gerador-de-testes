@@ -1,27 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Gerador_de_testes.WebApp.ActionFilters;
+namespace TesteFacil.WebApp.ActionFilters;
 
 public class ValidarModeloAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        // Lógica ANTES da execução do método de ação
+        if (context.Controller is not Controller controller)
+            return;
+
         var modelState = context.ModelState;
 
-        if (!modelState.IsValid)
-        {
-            var controller = (Controller)context.Controller;
+        var viewModel = context.ActionArguments.Values
+            .FirstOrDefault(x => x?.GetType().Name.EndsWith("ViewModel") == true);
 
-            var viewModel = context.ActionArguments
-                .Values
-                .FirstOrDefault(x => x is not null && x.GetType().Name.EndsWith("ViewModel"));
-
-            //if(viewModel == null)
-            //    context.Result = controller.View("/Home/Index");
-            //else
-            context.Result = controller.View(viewModel);
-        }
+        if (!modelState.IsValid && viewModel is not null)
+            context.HttpContext.Items["ModelStateInvalid"] = true;
     }
 }

@@ -1,25 +1,29 @@
-﻿using Gerador_de_testes.ModuloQuestao;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TesteFacil.Dominio.ModuloQuestao;
 
-namespace Gerador_de_testes.Infraestrutura.Orm.ModuloGestao
+namespace TesteFacil.Infraestrutura.Orm.ModuloQuestao;
+
+public class MapeadorAlternativaEmOrm : IEntityTypeConfiguration<Alternativa>
 {
-    public class MapeadorAlternativa : IEntityTypeConfiguration<Alternativa>
+    public void Configure(EntityTypeBuilder<Alternativa> builder)
     {
-        public void Configure(EntityTypeBuilder<Alternativa> builder)
-        {
-            builder.Property(x => x.Id)
-                .ValueGeneratedNever()
-                .IsRequired();
+        builder.Property(a => a.Id)
+            .ValueGeneratedNever()
+            .IsRequired();
 
-            builder.Property(x => x.Resposta)
-                .IsRequired()
-                .HasMaxLength(500);
+        builder.Property(a => a.Letra)
+            .IsRequired();
 
-            builder.Property(x => x.Correta);
-         
-            builder.HasOne(a => a.Questao)
-                .WithMany(q => q.Alternativas);
-        }
+        builder.Property(a => a.Resposta)
+            .HasMaxLength(200)
+            .IsRequired();
+
+        builder.Property(a => a.Correta)
+            .IsRequired();
+
+        builder.HasOne(a => a.Questao)
+            .WithMany(q => q.Alternativas)
+            .IsRequired();
     }
 }

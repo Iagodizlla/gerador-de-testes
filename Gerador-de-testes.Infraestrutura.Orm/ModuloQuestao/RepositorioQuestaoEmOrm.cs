@@ -1,70 +1,51 @@
-﻿using Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
-using Gerador_de_testes.ModuloQuestao;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TesteFacil.Dominio.ModuloMateria;
+using TesteFacil.Dominio.ModuloQuestao;
+using TesteFacil.Infraestrutura.Orm.Compartilhado;
 
-namespace Gerador_de_testes.Infraestrutura.Orm.ModuloGestao
+namespace TesteFacil.Infraestrutura.Orm.ModuloQuestao;
+
+public class RepositorioQuestaoEmOrm : RepositorioBaseEmOrm<Questao>, IRepositorioQuestao
 {
-    public class RepositorioQuestaoEmOrm : RepositorioBaseEmOrm<Questao>, IRepositorioQuestao
+    public RepositorioQuestaoEmOrm(TesteFacilDbContext contexto) : base(contexto)
     {
-        private readonly DbSet<Questao> registros;
-        public RepositorioQuestaoEmOrm(GeradorDeTestesDbContext contextoDados) : base(contextoDados)
-        {
-            registros = contextoDados.Set<Questao>();
-        }
-        public override Questao? SelecionarRegistroPorId(Guid idRegistro)
-        {
-            return registros
-            .Include(q => q.Materia)
+    }
+
+    public List<Questao> SelecionarQuestoesPorDisciplinaESerie(Guid disciplinaId, SerieMateria serie, int quantidadeQuestoes)
+    {
+        return registros
             .Include(q => q.Alternativas)
-            .FirstOrDefault(x => x.Id == idRegistro);
-        }
-        public void AdicionarAlternativa(Alternativa alternativa, Guid IdQuestao)
-        {
-            var registro = SelecionarRegistroPorId(IdQuestao)!;
-            registro.Alternativas.Add(alternativa);
-        }
-        public bool AtualizarAlternativa(Alternativa alternativa)
-        {
-            var registro = alternativa.Questao;
-            if(registro is null) return false;
+            .Include(q => q.Materia)
+            .ThenInclude(m => m.Disciplina)
+            .Where(x => x.Materia.Disciplina.Id.Equals(disciplinaId))
+            .Where(x => x.Materia.Serie.Equals(serie))
+            .Take(quantidadeQuestoes)
+            .ToList();
+    }
 
-            registro.Alternativas.ForEach(a => a.Correta = false);
+    public List<Questao> SelecionarQuestoesPorMateria(Guid materiaId, int quantidadeQuestoes)
+    {
+        return registros
+            .Include(q => q.Alternativas)
+            .Include(q => q.Materia)
+            .Where(x => x.Materia.Id.Equals(materiaId))
+            .Take(quantidadeQuestoes)
+            .ToList();
+    }
 
-            var alternativaCorreta = registro.Alternativas
-            .FirstOrDefault(a => a.Id == alternativa.Id);
-            if (alternativaCorreta is null) return false;
-            alternativaCorreta.Correta = true;
-            return true;
-        }
+    public override Questao? SelecionarRegistroPorId(Guid idRegistro)
+    {
+        return registros
+            .Include(x => x.Alternativas)
+            .Include(x => x.Materia)
+            .FirstOrDefault(x => x.Id.Equals(idRegistro));
+    }
 
-        public bool RemoverAlternativa(Alternativa alternativa)
-        {
-            var registro = alternativa.Questao;
-            registro.Alternativas.Remove(alternativa);
-            return true;
-        }
-
-        public Alternativa SelecionarAlternativa(Guid idAlternativa)
-        {
-            foreach (var questoes in SelecionarRegistros())
-            {
-                foreach(var alternativa in questoes.Alternativas)
-                {
-                    if(alternativa.Id == idAlternativa)
-                        return alternativa;
-                }
-            }
-            return null;
-        }
-
-        public List<Alternativa> SelecionarTodasAlternativasDaQuestao(Questao questao)
-        {
-            return questao.Alternativas;
-        }
-
-        public virtual List<Questao> SelecionarRegistros()
-        {
-            return registros.Include(x => x.Materia).ToList();
-        }
+    public override List<Questao> SelecionarRegistros()
+    {
+        return registros
+            .Include(x => x.Alternativas)
+            .Include(x => x.Materia)
+            .ToList();
     }
 }

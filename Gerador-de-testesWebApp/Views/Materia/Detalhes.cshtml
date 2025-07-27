@@ -1,0 +1,38 @@
+﻿﻿@using TesteFacil.Dominio.Extensions
+@model DetalhesMateriaViewModel
+
+@{
+    ViewBag.Titulo = "Detalhes da Matéria";
+}
+
+<hr />
+<div class="row justify-content-center my-5">
+    <div class="col-md-8">
+
+        <div class="card rounded-4 border-0">
+            <div class="card-body p-md-5">
+                <h3>Detalhes</h3>
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label for="Nome" class="control-label fs-5">Nome:</label>
+                    <input name="Nome" class="form-control" value="@Model.Nome" readonly disabled />
+                </div>
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label for="Serie" class="control-label fs-5">Série:</label>
+                    <input name="Serie" class="form-control" value="@Model.Serie.GetDisplayName()" readonly disabled />
+                </div>
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label for="Disciplina" class="control-label fs-5">Disciplina:</label>
+                    <input name="Disciplina" class="form-control" value="@Model.Disciplina" readonly disabled />
+                </div>
+
+                <div class="form-group d-flex align-items-center justify-content-end gap-3 mt-5">
+                    <a asp-action="Index">Voltar para a listagem</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

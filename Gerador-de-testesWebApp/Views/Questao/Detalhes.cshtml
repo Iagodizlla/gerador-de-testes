@@ -1,35 +1,67 @@
-﻿@model GerenciarAlternativasViewModel
+﻿﻿@model DetalhesQuestaoViewModel
 
 @{
-    Layout = "_Layout";
-    ViewBag.Titulo = "Alternativas da Questão";
+    ViewBag.Titulo = "Detalhes da Questão";
 }
+
+<hr />
 <div class="row justify-content-center my-5">
     <div class="col-md-8">
+
         <div class="card rounded-4 border-0">
             <div class="card-body p-md-5">
-                <h4 class="text-center mb-4">@Model.Questao.Enunciado</h4>
+                <h3>Detalhes</h3>
 
-                <div class="list-group">
-                    @foreach (var alternativa in Model.Questao.Alternativas)
-                    {
-                        <div class="list-group-item d-flex justify-content-between align-items-center @(alternativa.Correta ? "border-success" : "")" style="border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;">
-                            <span>@alternativa.Resposta</span>
-
-                            @if (alternativa.Correta)
-                            {
-                                <span class="badge bg-success">Correta</span>
-                            }
-                        </div>
-                    }
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label for="Enunciado" class="control-label fs-5">Enunciado:</label>
+                    <input name="Enunciado" class="form-control" value="@Model.Enunciado" readonly disabled />
                 </div>
 
-                <div class="text-center mt-4">
-                    <a href="/questoes" class="btn btn-secondary">Voltar</a>
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label for="Materia" class="control-label fs-5">Materia:</label>
+                    <input name="Materia" class="form-control" value="@Model.Materia" readonly disabled />
+                </div>
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label for="UtilizadaEmTeste" class="control-label fs-5">Utilizada em Teste:</label>
+                    <input name="UtilizadaEmTeste" class="form-control" value="@Model.UtilizadaEmTeste" readonly disabled />
+                </div>
+
+                <div class="form-group d-grid gap-2 mt-3">
+                    <label for="Enunciado" class="control-label fs-5">Enunciado:</label>
+                    <input name="Enunciado" class="form-control" value="@Model.Enunciado" readonly disabled />
+                </div>
+
+                @if (Model.Alternativas.Count > 0)
+                {
+                    <label for="Materias" class="control-label fs-5 mt-4">Alternativas:</label>
+
+                    <table class="table table-sm table-striped mt-2">
+                        <thead>
+                            <tr>
+                                <th>Letra</th>
+                                <th>Resposta</th>
+                                <th>Correta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in Model.Alternativas)
+                            {
+                                <tr>
+                                    <td>@m.Letra)</td>
+                                    <td>@m.Resposta</td>
+                                    <td>@(m.Correta ? "Sim" : "Não")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+
+                <div class="form-group d-flex align-items-center justify-content-end gap-3 mt-5">
+                    <a asp-action="Index">Voltar para a listagem</a>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
-
-

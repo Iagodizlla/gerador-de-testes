@@ -1,59 +1,53 @@
-﻿using Gerador_de_testes.Compartilhado;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using TesteFacil.Dominio.Compartilhado;
 
-namespace Gerador_de_testes.Infraestrutura.Orm.Compartilhado
+namespace TesteFacil.Infraestrutura.Orm.Compartilhado;
+
+public class RepositorioBaseEmOrm<T> where T : EntidadeBase<T>
 {
-    public class RepositorioBaseEmOrm<T> where T : EntidadeBase<T>
+    protected readonly DbSet<T> registros;
+
+    public RepositorioBaseEmOrm(TesteFacilDbContext contexto)
     {
-        private readonly DbSet<T> registros;
+        this.registros = contexto.Set<T>();
+    }
 
-        public RepositorioBaseEmOrm(GeradorDeTestesDbContext contexto)
-        {
-            this.registros = contexto.Set<T>();
-        }
+    public void Cadastrar(T novoRegistro)
+    {
+        registros.Add(novoRegistro);
+    }
 
-        public void CadastrarRegistro(T novoRegistro)
-        {
-            registros.Add(novoRegistro);
-        }
+    public bool Editar(Guid idRegistro, T registroEditado)
+    {
+        var registroSelecionado = SelecionarRegistroPorId(idRegistro);
 
-        public bool EditarRegistro(Guid idRegistro, T registroEditado)
-        {
-            var registroSelecionado = SelecionarRegistroPorId(idRegistro);
+        if (registroSelecionado is null)
+            return false;
 
-            if (registroSelecionado is null)
-                return false;
+        registroSelecionado.AtualizarRegistro(registroEditado);
 
-            registroSelecionado.AtualizarRegistro(registroEditado);
+        return true;
+    }
 
-            return true;
-        }
+    public bool Excluir(Guid idRegistro)
+    {
+        var registroSelecionado = SelecionarRegistroPorId(idRegistro);
 
-        public bool ExcluirRegistro(Guid idRegistro)
-        {
-            var registroSelecionado = SelecionarRegistroPorId(idRegistro);
+        if (registroSelecionado is null)
+            return false;
 
-            if (registroSelecionado is null)
-                return false;
+        registros.Remove(registroSelecionado);
 
-            registros.Remove(registroSelecionado);
+        return true;
+    }
 
-            return true;
-        }
+    public virtual T? SelecionarRegistroPorId(Guid idRegistro)
+    {
+        return registros.FirstOrDefault(x => x.Id.Equals(idRegistro));
+    }
 
-        public virtual T? SelecionarRegistroPorId(Guid idRegistro)
-        {
-            return registros.FirstOrDefault(x => x.Id.Equals(idRegistro));
-        }
-
-        public virtual List<T> SelecionarRegistros()
-        {
-            return registros.ToList();
-        }
+    public virtual List<T> SelecionarRegistros()
+    {
+        return registros.ToList();
     }
 }

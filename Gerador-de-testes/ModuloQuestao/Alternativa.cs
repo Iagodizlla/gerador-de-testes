@@ -1,28 +1,23 @@
-﻿using Gerador_de_testes.ModuloMateria;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Gerador_de_testes.ModuloQuestao;
 
-namespace Gerador_de_testes.ModuloQuestao
+namespace TesteFacil.Dominio.ModuloQuestao;
+
+public class Alternativa
 {
-    public class Alternativa
+    public Guid Id { get; set; }
+    public char Letra { get; set; }
+    public string Resposta { get; set; }
+    public bool Correta { get; set; }
+    public Questao Questao { get; set; }
+
+    protected Alternativa() { }
+
+    public Alternativa(char letra, string resposta, bool correta, Questao questao) : this()
     {
-        public Guid Id { get; set; }
-        public string Resposta { get; set; }
-        public Questao Questao { get; set; }
-        public bool Correta { get; set; }
-        public Alternativa() { }
-        public Alternativa(string resposta, bool correta, Questao questao)
-        {
-            Id = Guid.NewGuid();
-            Resposta = resposta;
-            Correta = correta;
-            Questao = new Questao();
-        }
+        Id = Guid.NewGuid();
+        Letra = letra;
+        Resposta = resposta;
+        Questao = questao;
+        Correta = correta;
     }
-   
 }
-
-

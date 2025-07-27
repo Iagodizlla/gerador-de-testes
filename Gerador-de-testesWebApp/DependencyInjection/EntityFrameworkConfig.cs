@@ -1,14 +1,19 @@
-﻿using Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TesteFacil.Dominio.Compartilhado;
+using TesteFacil.Infraestrutura.Orm.Compartilhado;
 
-namespace Gerador_de_testes.WebApp.DependencyInjection;
+namespace TesteFacil.WebApp.DependencyInjection;
 
 public static class EntityFrameworkConfig
 {
-    public static void AddEntityFrameworkConfig(this IServiceCollection services, IConfiguration configuration)
+    public static void AddEntityFrameworkConfig(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         var connectionString = configuration["SQL_CONNECTION_STRING"];
 
-        services.AddDbContext<GeradorDeTestesDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddDbContext<IUnitOfWork, TesteFacilDbContext>(options =>
+            options.UseNpgsql(connectionString));
     }
 }

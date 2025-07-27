@@ -1,7 +1,7 @@
-﻿using Gerador_de_testes.Infraestrutura.Orm.Compartilhado;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TesteFacil.Infraestrutura.Orm.Compartilhado;
 
-namespace Gerador_de_testes.WebApp.Orm;
+namespace TesteFacil.WebApp.Orm;
 
 public static class DatabaseOperations
 {
@@ -9,7 +9,7 @@ public static class DatabaseOperations
     {
         var scope = app.Services.CreateScope();
 
-        var dbContext = scope.ServiceProvider.GetRequiredService<GeradorDeTestesDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<TesteFacilDbContext>();
 
         dbContext.Database.Migrate();
     }

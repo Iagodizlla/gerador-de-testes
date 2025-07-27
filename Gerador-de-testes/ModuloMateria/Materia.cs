@@ -1,30 +1,27 @@
-﻿using Gerador_de_testes.Compartilhado;
-using Gerador_de_testes.ModuloDisciplina;
+﻿using Gerador_de_testes.ModuloDeTestes;
 using Gerador_de_testes.ModuloQuestao;
+using TesteFacil.Dominio.Compartilhado;
+using TesteFacil.Dominio.ModuloDisciplina;
+using TesteFacil.Dominio.ModuloQuestao;
+using TesteFacil.Dominio.ModuloTeste;
 
-namespace Gerador_de_testes.ModuloMateria;
+namespace TesteFacil.Dominio.ModuloMateria;
 
 public class Materia : EntidadeBase<Materia>
 {
     public string Nome { get; set; }
-    public string Serie { get; set; }
+    public SerieMateria Serie { get; set; }
     public Disciplina Disciplina { get; set; }
     public List<Questao> Questoes { get; set; }
+    public List<Teste> Testes { get; set; }
 
-    public Materia()
+    protected Materia()
     {
-        Disciplina = new Disciplina();
-    }
-    public Materia(string nome, string serie, Disciplina disciplina, List<Questao> questoes) : this()
-    {
-        Id = Guid.NewGuid();
-        Nome = nome;
-        Serie = serie;
-        Disciplina = disciplina;
-        Questoes = questoes;
+        Questoes = new List<Questao>();
+        Testes = new List<Teste>();
     }
 
-    public Materia(string nome, string serie, Disciplina disciplina)
+    public Materia(string nome, SerieMateria serie, Disciplina disciplina) : this()
     {
         Id = Guid.NewGuid();
         Nome = nome;
@@ -32,19 +29,32 @@ public class Materia : EntidadeBase<Materia>
         Disciplina = disciplina;
     }
 
-    public void RegistrarDisciplina(Disciplina disciplina)
+    public void AdicionarQuestao(Questao questao)
     {
-        this.RemoverDisciplina();
-        Disciplina = disciplina;
-        disciplina.Materias.Add(this);
+        if (Questoes.Contains(questao))
+            return;
+
+        Questoes.Add(questao);
     }
-    public void RemoverDisciplina()
+
+    public void RemoverQuestao(Questao questao)
     {
-        if (Disciplina != null)
-        {
-            Disciplina.Materias.Remove(this);
-        }
+        if (!Questoes.Contains(questao))
+            return;
+
+        Questoes.Remove(questao);
     }
+
+    public List<Questao> ObterQuestoesAleatorias(int quantidadeQuestoes)
+    {
+        var random = new Random();
+
+        return Questoes
+            .OrderBy(q => random.Next())
+            .Take(quantidadeQuestoes)
+            .ToList();
+    }
+
     public override void AtualizarRegistro(Materia registroEditado)
     {
         Nome = registroEditado.Nome;

@@ -1,9 +1,22 @@
 ﻿﻿﻿@{
 Layout = "_Layout";
 ViewBag.Titulo = "Erro inesperado";
+
+var notificacao = ViewData[nameof(NotificacaoViewModel)] as NotificacaoViewModel;
 }
 
 <hr />
+
+
+@if (notificacao is not null)
+{
+	<div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+		<h6>@notificacao.Titulo</h6>
+		@notificacao.Mensagem
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+}
+
 
 <p class="fs-5 mt-4">Ocorreu um erro inesperado durante a execução da ação... tente novamente.</p>
 <a asp-action="Index" class="fs-5 mt-4">Voltar para a página inicial</a>
