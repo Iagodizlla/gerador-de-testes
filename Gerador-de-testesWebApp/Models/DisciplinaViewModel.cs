@@ -1,6 +1,4 @@
-﻿using Gerador_de_testes.ModuloDisciplina;
-using Gerador_de_testes.ModuloMateria;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using TesteFacil.Dominio.ModuloDisciplina;
 using TesteFacil.Dominio.ModuloMateria;
 

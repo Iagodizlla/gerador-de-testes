@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Gerador_de_testes.Infraestrutura.Orm</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TesteFacil.Dominio\TesteFacil.Dominio.csproj" />
+    <ProjectReference Include="..\TesteFacil.Aplicacao\TesteFacil.Aplicacao.csproj" />
+  </ItemGroup>
+
+</Project>

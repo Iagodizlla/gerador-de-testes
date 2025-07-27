@@ -1,7 +1,4 @@
-﻿using Gerador_de_testes.ModuloDeTestes;
-using Gerador_de_testes.ModuloMateria;
-using Gerador_de_testes.ModuloQuestao;
-using TesteFacil.Dominio.Compartilhado;
+﻿using TesteFacil.Dominio.Compartilhado;
 using TesteFacil.Dominio.ModuloMateria;
 using TesteFacil.Dominio.ModuloQuestao;
 using TesteFacil.Dominio.ModuloTeste;

@@ -1,5 +1,4 @@
-﻿using Gerador_de_testes.WebApp.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text.Json;
 using TesteFacil.Aplicacao.ModuloDisciplina;

@@ -1,5 +1,4 @@
-﻿using Gerador_de_testes.ModuloMateria;
-using TesteFacil.Dominio.Compartilhado;
+﻿using TesteFacil.Dominio.Compartilhado;
 
 namespace TesteFacil.Dominio.ModuloMateria;
 

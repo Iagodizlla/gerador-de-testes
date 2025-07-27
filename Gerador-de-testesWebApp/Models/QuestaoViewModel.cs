@@ -1,6 +1,4 @@
-﻿using Gerador_de_testes.ModuloMateria;
-using Gerador_de_testes.ModuloQuestao;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using TesteFacil.Dominio.ModuloMateria;
 using TesteFacil.Dominio.ModuloQuestao;

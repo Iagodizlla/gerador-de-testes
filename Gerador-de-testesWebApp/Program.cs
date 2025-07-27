@@ -1,11 +1,3 @@
-using Gerador_de_testes.Infraestrutura.Orm.ModuloDeTestes;
-using Gerador_de_testes.Infraestrutura.Orm.ModuloDisciplina;
-using Gerador_de_testes.Infraestrutura.Orm.ModuloGestao;
-using Gerador_de_testes.Infraestrutura.Orm.ModuloMateria;
-using Gerador_de_testes.ModuloDeTestes;
-using Gerador_de_testes.ModuloDisciplina;
-using Gerador_de_testes.ModuloMateria;
-using Gerador_de_testes.ModuloQuestao;
 using TesteFacil.Aplicacao.ModuloDisciplina;
 using TesteFacil.Aplicacao.ModuloMateria;
 using TesteFacil.Dominio.ModuloDisciplina;

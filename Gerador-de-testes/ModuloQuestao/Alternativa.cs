@@ -1,6 +1,4 @@
-﻿using Gerador_de_testes.ModuloQuestao;
-
-namespace TesteFacil.Dominio.ModuloQuestao;
+﻿namespace TesteFacil.Dominio.ModuloQuestao;
 
 public class Alternativa
 {

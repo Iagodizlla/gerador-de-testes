@@ -1,7 +1,4 @@
-﻿using Gerador_de_testes.ModuloMateria;
-using Gerador_de_testes.ModuloQuestao;
-using Gerador_de_testes.WebApp.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TesteFacil.Dominio.Compartilhado;
 using TesteFacil.Dominio.ModuloMateria;

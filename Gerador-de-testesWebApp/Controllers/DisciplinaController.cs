@@ -1,10 +1,6 @@
-﻿using FluentResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using TesteFacil.Aplicacao.ModuloDisciplina;
-using TesteFacil.Dominio.ModuloDisciplina;
-using TesteFacil.WebApp.Extensions;
 using TesteFacil.WebApp.Models;
 
 namespace TesteFacil.WebApp.Controllers;
