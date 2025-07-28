@@ -1,6 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text.Json;
+using TesteFacil.Aplicacao.ModuloDisciplina;
+using TesteFacil.Aplicacao.ModuloMateria;
+using TesteFacil.Aplicacao.ModuloQuestao;
 using TesteFacil.Dominio.Compartilhado;
+using TesteFacil.Dominio.ModuloDisciplina;
 using TesteFacil.Dominio.ModuloMateria;
 using TesteFacil.Dominio.ModuloQuestao;
 using TesteFacil.WebApp.Models;
@@ -10,20 +15,20 @@ namespace TesteFacil.WebApp.Controllers;
 [Route("questoes")]
 public class QuestaoController : Controller
 {
-    private readonly IRepositorioQuestao repositorioQuestao;
-    private readonly IRepositorioMateria repositorioMateria;
+    private readonly QuestaoAppService questaoAppService;
+    private readonly MateriaAppService materiaAppService;
     private readonly IUnitOfWork unitOfWork;
     private readonly ILogger<QuestaoController> logger;
 
     public QuestaoController(
-        IRepositorioQuestao repositorioQuestao,
-        IRepositorioMateria repositorioMateria,
+        QuestaoAppService repositorioQuestao,
+        MateriaAppService repositorioMateria,
         IUnitOfWork unitOfWork,
         ILogger<QuestaoController> logger
     )
     {
-        this.repositorioQuestao = repositorioQuestao;
-        this.repositorioMateria = repositorioMateria;
+        this.questaoAppService = repositorioQuestao;
+        this.materiaAppService = repositorioMateria;
         this.unitOfWork = unitOfWork;
         this.logger = logger;
     }
@@ -31,9 +36,36 @@ public class QuestaoController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        var registros = repositorioQuestao.SelecionarRegistros();
+        var resultado = questaoAppService.SelecionarRegistros();
+
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
+            return RedirectToAction("erro", "home");
+        }
+
+        var registros = resultado.Value;
 
         var visualizarVM = new VisualizarQuestoesViewModel(registros);
+
+        var existeNotificacao = TempData.TryGetValue(nameof(NotificacaoViewModel), out var valor);
+
+        if (existeNotificacao && valor is string jsonString)
+        {
+            var notificacaoVm = JsonSerializer.Deserialize<NotificacaoViewModel>(jsonString);
+
+            ViewData.Add(nameof(NotificacaoViewModel), notificacaoVm);
+        }
 
         return View(visualizarVM);
     }
@@ -41,9 +73,11 @@ public class QuestaoController : Controller
     [HttpGet("cadastrar")]
     public IActionResult Cadastrar()
     {
-        var materias = repositorioMateria.SelecionarRegistros();
+        var materias = materiaAppService.SelecionarTodos();
 
-        var cadastrarVM = new CadastrarQuestaoViewModel(materias);
+        var valor = materias.Value;
+
+        var cadastrarVM = new CadastrarQuestaoViewModel(valor);
 
         return View(cadastrarVM);
     }
@@ -52,42 +86,34 @@ public class QuestaoController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Cadastrar(CadastrarQuestaoViewModel cadastrarVM)
     {
-        var registros = repositorioQuestao.SelecionarRegistros();
+        var Resultadoregistros = questaoAppService.SelecionarRegistros();
 
-        var materias = repositorioMateria.SelecionarRegistros();
+        var registros = Resultadoregistros.Value;
 
-        // Validação: enunciados duplicados
-        if (registros.Any(i => i.Enunciado.Equals(cadastrarVM.Enunciado)))
+        var Resultadomaterias = materiaAppService.SelecionarTodos();
+
+        var materias = Resultadomaterias.Value;
+
+        var entidade = FormularioQuestaoViewModel.ParaEntidade(cadastrarVM, materias);
+
+        var resultado = questaoAppService.Cadastrar(entidade);
+
+        if (resultado.IsFailed)
         {
-            ModelState.AddModelError(
-                "CadastroUnico",
-                "Já existe uma questão registrada com este enunciado."
-            );
+            foreach (var erro in resultado.Errors)
+            {
+                if (erro.Metadata["TipoErro"].ToString() == "RegistroDuplicado")
+                {
+                    ModelState.AddModelError("CadastroUnico", erro.Reasons[0].Message);
+                    break;
+                }
+            }
 
             cadastrarVM.MateriasDisponiveis = materias
                 .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
                 .ToList();
 
             return View(cadastrarVM);
-        }
-
-        try
-        {
-            var entidade = CadastrarQuestaoViewModel.ParaEntidade(cadastrarVM, materias);
-
-            repositorioQuestao.Cadastrar(entidade);
-
-            unitOfWork.Commit();
-        }
-        catch (Exception ex)
-        {
-            unitOfWork.Rollback();
-
-            logger.LogError(
-                ex,
-                "Ocorreu um erro durante o registro de {@ViewModel}.",
-                cadastrarVM
-            );
         }
 
         return RedirectToAction(nameof(Index));
@@ -99,10 +125,13 @@ public class QuestaoController : Controller
         AdicionarAlternativaQuestaoViewModel alternativaVm
     )
     {
-        cadastrarVm.MateriasDisponiveis = repositorioMateria
-            .SelecionarRegistros()
-            .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
-            .ToList();
+        var Resultadomaterias = materiaAppService.SelecionarTodos();
+
+        var materias = Resultadomaterias.Value;
+
+        cadastrarVm.MateriasDisponiveis = materias
+                .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
+                .ToList();
 
         // Validação: respostas duplicadas
         if (cadastrarVm.AlternativasSelecionadas.Any(a => a.Resposta.Equals(alternativaVm.Resposta)))
@@ -140,10 +169,13 @@ public class QuestaoController : Controller
         if (alternativa is not null)
             cadastrarVm.RemoverAlternativa(alternativa);
 
-        cadastrarVm.MateriasDisponiveis = repositorioMateria
-            .SelecionarRegistros()
-            .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
-            .ToList();
+        var Resultadomaterias = materiaAppService.SelecionarTodos();
+
+        var materias = Resultadomaterias.Value;
+
+        cadastrarVm.MateriasDisponiveis = materias
+                .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
+                .ToList();
 
         return View(nameof(Cadastrar), cadastrarVm);
     }
@@ -151,63 +183,69 @@ public class QuestaoController : Controller
     [HttpGet("editar/{id:guid}")]
     public IActionResult Editar(Guid id)
     {
-        var registro = repositorioQuestao.SelecionarRegistroPorId(id);
+        var resultadoMaterias = materiaAppService.SelecionarTodos();
 
-        if (registro is null)
+        var materias = resultadoMaterias.Value;
+
+        var resultadoQuestao = questaoAppService.SelecionarRegistroPorId(id);
+
+        if (resultadoQuestao.IsFailed)
+        {
+            foreach (var erro in resultadoQuestao.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
             return RedirectToAction(nameof(Index));
+        }
 
-        var materias = repositorioMateria.SelecionarRegistros();
+        var registroSelecionado = resultadoQuestao.Value;
 
-        var editarVm = new EditarQuestaoViewModel(
-            registro.Id,
-            registro.Enunciado,
-            registro.Materia.Id,
-            registro.Alternativas,
+        var editarVM = new EditarQuestaoViewModel(
+            id,
+            registroSelecionado.Enunciado,
+            registroSelecionado.Materia.Id,
+            registroSelecionado.Alternativas,
             materias
         );
 
-        return View(editarVm);
+        return View(editarVM);
     }
 
     [HttpPost("editar/{id:guid}")]
     [ValidateAntiForgeryToken]
     public IActionResult Editar(Guid id, EditarQuestaoViewModel editarVm)
     {
-        var registros = repositorioQuestao.SelecionarRegistros();
+        var resultadoMaterias = materiaAppService.SelecionarTodos();
 
-        var materias = repositorioMateria.SelecionarRegistros();
+        var materias = resultadoMaterias.Value;
 
-        if (registros.Any(i => !i.Id.Equals(id) && i.Enunciado.Equals(editarVm.Enunciado)))
+        var entidadeEditada = FormularioQuestaoViewModel.ParaEntidade(editarVm, materias);
+
+        var resultado = questaoAppService.Editar(id, entidadeEditada);
+
+        if (resultado.IsFailed)
         {
-            ModelState.AddModelError(
-                "CadastroUnico",
-                "Já existe uma questão registrada com este enunciado."
-            );
+            foreach (var erro in resultado.Errors)
+            {
+                if (erro.Metadata["TipoErro"].ToString() == "RegistroDuplicado")
+                {
+                    ModelState.AddModelError("CadastroUnico", erro.Reasons[0].Message);
+                    break;
+                }
+            }
 
             editarVm.MateriasDisponiveis = materias
                 .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
                 .ToList();
 
             return View(editarVm);
-        }
-
-        try
-        {
-            var entidadeEditada = EditarQuestaoViewModel.ParaEntidade(editarVm, materias);
-
-            repositorioQuestao.Editar(id, entidadeEditada);
-
-            unitOfWork.Commit();
-        }
-        catch (Exception ex)
-        {
-            unitOfWork.Rollback();
-
-            logger.LogError(
-                ex,
-                "Ocorreu um erro durante o registro de {@ViewModel}.",
-                editarVm
-            );
         }
 
         return RedirectToAction(nameof(Index));
@@ -219,10 +257,13 @@ public class QuestaoController : Controller
        AdicionarAlternativaQuestaoViewModel alternativaVm
    )
     {
-        editarVm.MateriasDisponiveis = repositorioMateria
-            .SelecionarRegistros()
-            .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
-            .ToList();
+        var Resultadomaterias = materiaAppService.SelecionarTodos();
+
+        var materias = Resultadomaterias.Value;
+
+        editarVm.MateriasDisponiveis = materias
+                .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
+                .ToList();
 
         if (editarVm.AlternativasSelecionadas.Any(a => a.Resposta.Equals(alternativaVm.Resposta)))
         {
@@ -246,7 +287,8 @@ public class QuestaoController : Controller
 
         editarVm.AdicionarAlternativa(alternativaVm);
 
-        var registro = repositorioQuestao.SelecionarRegistroPorId(editarVm.Id);
+        var Resultadoregistro = questaoAppService.SelecionarRegistroPorId(editarVm.Id);
+        var registro = Resultadoregistro.Value;
 
         if (registro is null)
             return RedirectToAction(nameof(Index));
@@ -261,17 +303,21 @@ public class QuestaoController : Controller
     [HttpPost("editar/{id:guid}/remover-alternativa/{letra:alpha}")]
     public IActionResult RemoverAlternativa(char letra, EditarQuestaoViewModel editarVm)
     {
-        editarVm.MateriasDisponiveis = repositorioMateria
-            .SelecionarRegistros()
-            .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
-            .ToList();
+        var Resultadomaterias = materiaAppService.SelecionarTodos();
+
+        var materias = Resultadomaterias.Value;
+
+        editarVm.MateriasDisponiveis = materias
+                .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
+                .ToList();
 
         var alternativa = editarVm.AlternativasSelecionadas
             .Find(a => a.Letra.Equals(letra));
 
         if (alternativa is not null)
         {
-            var registro = repositorioQuestao.SelecionarRegistroPorId(editarVm.Id);
+            var Resultadoregistro = questaoAppService.SelecionarRegistroPorId(editarVm.Id);
+            var registro = Resultadoregistro.Value;
 
             if (registro is null)
                 return RedirectToAction(nameof(Index));
@@ -289,10 +335,25 @@ public class QuestaoController : Controller
     [HttpGet("excluir/{id:guid}")]
     public IActionResult Excluir(Guid id)
     {
-        var registroSelecionado = repositorioQuestao.SelecionarRegistroPorId(id);
+        var resultado = questaoAppService.SelecionarRegistroPorId(id);
 
-        if (registroSelecionado is null)
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
             return RedirectToAction(nameof(Index));
+        }
+
+        var registroSelecionado = resultado.Value;
 
         var excluirVM = new ExcluirQuestaoViewModel(
             registroSelecionado.Id,
@@ -306,21 +367,20 @@ public class QuestaoController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult ExcluirConfirmado(Guid id)
     {
-        try
-        {
-            repositorioQuestao.Excluir(id);
+        var resultado = questaoAppService.Excluir(id);
 
-            unitOfWork.Commit();
-        }
-        catch (Exception ex)
+        if (resultado.IsFailed)
         {
-            unitOfWork.Rollback();
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
 
-            logger.LogError(
-                ex,
-                "Ocorreu um erro durante a exclusão do registro {Id}.",
-                id
-            );
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
         }
 
         return RedirectToAction(nameof(Index));
@@ -329,20 +389,26 @@ public class QuestaoController : Controller
     [HttpGet("detalhes/{id:guid}")]
     public IActionResult Detalhes(Guid id)
     {
-        var registroSelecionado = repositorioQuestao.SelecionarRegistroPorId(id);
+        var resultado = questaoAppService.SelecionarRegistroPorId(id);
 
-        if (registroSelecionado is null)
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
             return RedirectToAction(nameof(Index));
+        }
 
-        var detalhesVM = new DetalhesQuestaoViewModel(
-            id,
-            registroSelecionado.Enunciado,
-            registroSelecionado.Materia.Nome,
-            registroSelecionado.UtilizadaEmTeste ? "Sim" : "Não",
-            registroSelecionado.AlternativaCorreta?.Resposta ?? string.Empty,
-            registroSelecionado.Alternativas
-        );
+        var detalhesVm = DetalhesQuestaoViewModel.ParaDetalhesVm(resultado.Value);
 
-        return View(detalhesVM);
+        return View(detalhesVm);
     }
 }

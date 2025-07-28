@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using TesteFacil.Dominio.ModuloDisciplina;
 using TesteFacil.Dominio.ModuloMateria;
 using TesteFacil.Dominio.ModuloQuestao;
 
@@ -18,7 +19,18 @@ public abstract class FormularioQuestaoViewModel
 
     [MinLength(2, ErrorMessage = "O campo \"Alternativas\" precisa conter ao menos 2 itens.")]
     public List<AlternativaQuestaoViewModel> AlternativasSelecionadas { get; set; } = new List<AlternativaQuestaoViewModel>();
+    public static Questao ParaEntidade(FormularioQuestaoViewModel viewModel, List<Materia> materias)
+    {
+        Materia? Materia = materias.Find(i => i.Id.Equals(viewModel.MateriaId));
 
+        if (Materia is null)
+            throw new ArgumentNullException("A materia requisitada não foi encontrada no sistema.");
+
+        return new Questao(
+            viewModel.Enunciado ?? string.Empty,
+            viewModel.MateriaId.Equals(Guid.Empty) ? Materia : Materia
+        );
+    }
     public void AdicionarAlternativa(AdicionarAlternativaQuestaoViewModel alternativaVm)
     {
         var letraAlternativa = (char)('a' + AlternativasSelecionadas?.Count ?? 0);
