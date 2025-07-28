@@ -1,5 +1,7 @@
 using TesteFacil.Aplicacao.ModuloDisciplina;
 using TesteFacil.Aplicacao.ModuloMateria;
+using TesteFacil.Aplicacao.ModuloQuestao;
+using TesteFacil.Aplicacao.ModuloTeste;
 using TesteFacil.Dominio.ModuloDisciplina;
 using TesteFacil.Dominio.ModuloMateria;
 using TesteFacil.Dominio.ModuloQuestao;
@@ -24,6 +26,8 @@ public class Program
         {
             builder.Services.AddScoped<DisciplinaAppService>();
             builder.Services.AddScoped<MateriaAppService>();
+            builder.Services.AddScoped<QuestaoAppService>();
+            builder.Services.AddScoped<TesteAppService>();
             builder.Services.AddScoped<IRepositorioDisciplina, RepositorioDisciplinaEmOrm>();
             builder.Services.AddScoped<IRepositorioMateria, RepositorioMateriaEmOrm>();
             builder.Services.AddScoped<IRepositorioQuestao, RepositorioQuestaoEmOrm>();
