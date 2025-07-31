@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text.Json;
-using TesteFacil.Dominio.Compartilhado;
-using TesteFacil.Dominio.ModuloDisciplina;
-using TesteFacil.Dominio.ModuloMateria;
-using TesteFacil.Dominio.ModuloQuestao;
-using TesteFacil.Dominio.ModuloTeste;
+using TesteFacil.Aplicacao.ModuloDisciplina;
+using TesteFacil.Aplicacao.ModuloMateria;
+using TesteFacil.Aplicacao.ModuloQuestao;
+using TesteFacil.Aplicacao.ModuloTeste;
+using TesteFacil.Dominio.Extensions;
 using TesteFacil.WebApp.Models;
 
 namespace TesteFacil.WebApp.Controllers;
@@ -13,36 +13,55 @@ namespace TesteFacil.WebApp.Controllers;
 [Route("testes")]
 public class TesteController : Controller
 {
-    private readonly IRepositorioTeste repositorioTeste;
-    private readonly IRepositorioQuestao repositorioQuestao;
-    private readonly IRepositorioDisciplina repositorioDisciplina;
-    private readonly IRepositorioMateria repositorioMateria;
-    private readonly IUnitOfWork unitOfWork;
-    private readonly ILogger<TesteController> logger;
+    private readonly TesteAppService testeAppService;
+    private readonly QuestaoAppService questaoAppService;
+    private readonly MateriaAppService materiaAppService;
+    private readonly DisciplinaAppService disciplinaAppService;
 
     public TesteController(
-        IRepositorioTeste repositorioTeste,
-        IRepositorioQuestao repositorioQuestao,
-        IRepositorioDisciplina repositorioDisciplina,
-        IRepositorioMateria repositorioMateria,
-        IUnitOfWork unitOfWork,
-        ILogger<TesteController> logger
+        TesteAppService testeAppService,
+        QuestaoAppService questaoAppService,
+        MateriaAppService materiaAppService,
+        DisciplinaAppService disciplinaAppService
     )
     {
-        this.repositorioTeste = repositorioTeste;
-        this.repositorioQuestao = repositorioQuestao;
-        this.repositorioDisciplina = repositorioDisciplina;
-        this.repositorioMateria = repositorioMateria;
-        this.unitOfWork = unitOfWork;
-        this.logger = logger;
+        this.testeAppService = testeAppService;
+        this.questaoAppService = questaoAppService;
+        this.materiaAppService = materiaAppService;
+        this.disciplinaAppService = disciplinaAppService;
     }
 
     [HttpGet]
     public IActionResult Index()
     {
-        var registros = repositorioTeste.SelecionarRegistros();
+        var resultado = testeAppService.SelecionarTodos();
 
-        var visualizarVm = new VisualizarTestesViewModel(registros);
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
+            return RedirectToAction("erro", "home");
+        }
+
+        var visualizarVm = new VisualizarTestesViewModel(resultado.ValueOrDefault);
+
+        var existeNotificacao = TempData.TryGetValue(nameof(NotificacaoViewModel), out var valor);
+
+        if (existeNotificacao && valor is string jsonString)
+        {
+            var notificacaoVm = JsonSerializer.Deserialize<NotificacaoViewModel>(jsonString);
+
+            ViewData.Add(nameof(NotificacaoViewModel), notificacaoVm);
+        }
 
         return View(visualizarVm);
     }
@@ -50,7 +69,7 @@ public class TesteController : Controller
     [HttpGet("gerar/primeira-etapa")]
     public IActionResult PrimeiraEtapaGerar()
     {
-        var disciplinas = repositorioDisciplina.SelecionarRegistros();
+        var disciplinas = disciplinaAppService.SelecionarTodos().ValueOrDefault;
 
         var primeiraEtapaVm = new PrimeiraEtapaGerarTesteViewModel
         {
@@ -65,9 +84,9 @@ public class TesteController : Controller
     [HttpPost("gerar/primeira-etapa")]
     public IActionResult PrimeiraEtapaGerar(PrimeiraEtapaGerarTesteViewModel primeiraEtapaVm)
     {
-        var registros = repositorioTeste.SelecionarRegistros();
+        var registros = testeAppService.SelecionarTodos().ValueOrDefault;
 
-        var disciplinas = repositorioDisciplina.SelecionarRegistros();
+        var disciplinas = disciplinaAppService.SelecionarTodos().ValueOrDefault;
 
         if (registros.Any(i => i.Titulo.Equals(primeiraEtapaVm.Titulo)))
         {
@@ -83,13 +102,14 @@ public class TesteController : Controller
             return View(primeiraEtapaVm);
         }
 
-        var disciplinaSelecionada = repositorioDisciplina.SelecionarRegistroPorId(primeiraEtapaVm.DisciplinaId);
+        var disciplinaSelecionada = disciplinaAppService.SelecionarPorId(primeiraEtapaVm.DisciplinaId).Value;
 
         if (disciplinaSelecionada is null)
             return RedirectToAction(nameof(Index));
 
-        var materias = repositorioMateria
-            .SelecionarRegistros()
+        var materias = materiaAppService
+            .SelecionarTodos()
+            .ValueOrDefault
             .Where(m => m.Disciplina.Equals(disciplinaSelecionada))
             .Where(m => m.Serie.Equals(primeiraEtapaVm.Serie))
             .ToList();
@@ -124,9 +144,9 @@ public class TesteController : Controller
     [HttpPost("gerar/segunda-etapa/sortear-questoes")]
     public IActionResult SortearQuestoes(SegundaEtapaGerarTesteViewModel segundaEtapaVm)
     {
-        var disciplinas = repositorioDisciplina.SelecionarRegistros();
-        var materias = repositorioMateria.SelecionarRegistros();
-        var questoes = repositorioQuestao.SelecionarRegistros();
+        var disciplinas = disciplinaAppService.SelecionarTodos().ValueOrDefault;
+        var materias = materiaAppService.SelecionarTodos().ValueOrDefault;
+        var questoes = questaoAppService.SelecionarTodos().ValueOrDefault;
 
         var entidade = SegundaEtapaGerarTesteViewModel.ParaEntidade(
             segundaEtapaVm,
@@ -140,17 +160,11 @@ public class TesteController : Controller
         if (questoesSorteadas is null)
             return RedirectToAction(nameof(Index));
 
-        segundaEtapaVm.QuestoesSorteadas = questoesSorteadas.Select(q => new DetalhesQuestaoViewModel(
-            q.Id,
-            q.Enunciado,
-            q.Materia.Nome,
-            q.UtilizadaEmTeste ? "Sim" : "Não",
-            q.AlternativaCorreta?.Resposta ?? string.Empty,
-            q.Alternativas
-        )).ToList();
+        segundaEtapaVm.QuestoesSorteadas = questoesSorteadas
+            .Select(DetalhesQuestaoViewModel.ParaDetalhesVm)
+            .ToList();
 
-        segundaEtapaVm.MateriasDisponiveis = repositorioMateria
-            .SelecionarRegistros()
+        segundaEtapaVm.MateriasDisponiveis = materias
             .Where(m => m.Disciplina.Id.Equals(segundaEtapaVm.DisciplinaId))
             .Where(m => m.Serie.Equals(segundaEtapaVm.Serie))
             .Select(m => new SelectListItem(m.Nome, m.Id.ToString()))
@@ -162,32 +176,85 @@ public class TesteController : Controller
     [HttpPost("gerar/confirmar")]
     public IActionResult ConfirmarGeracao(SegundaEtapaGerarTesteViewModel segundaEtapaVm)
     {
-        var disciplinas = repositorioDisciplina.SelecionarRegistros();
-        var materias = repositorioMateria.SelecionarRegistros();
-        var questoes = repositorioQuestao.SelecionarRegistros();
+        var disciplinas = disciplinaAppService.SelecionarTodos().ValueOrDefault;
+        var materias = materiaAppService.SelecionarTodos().ValueOrDefault;
+        var questoes = questaoAppService.SelecionarTodos().ValueOrDefault;
 
-        try
+        var entidade = SegundaEtapaGerarTesteViewModel.ParaEntidade(
+            segundaEtapaVm,
+            disciplinas,
+            materias,
+            questoes
+        );
+
+        var resultado = testeAppService.Cadastrar(entidade);
+
+        if (resultado.IsFailed)
         {
-            var entidade = SegundaEtapaGerarTesteViewModel.ParaEntidade(
-                segundaEtapaVm,
-                disciplinas,
-                materias,
-                questoes
-            );
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
 
-            repositorioTeste.Cadastrar(entidade);
-
-            unitOfWork.Commit();
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
         }
-        catch (Exception ex)
-        {
-            unitOfWork.Rollback();
 
-            logger.LogError(
-                ex,
-                "Ocorreu um erro durante o registro de {@ViewModel}.",
-                segundaEtapaVm
-            );
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet("excluir/{id:guid}")]
+    public IActionResult Excluir(Guid id)
+    {
+        var resultado = testeAppService.SelecionarPorId(id);
+
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        var registro = resultado.Value;
+
+        var excluirVM = new ExcluirTesteViewModel(
+            registro.Id,
+            registro.Titulo
+        );
+
+        return View(excluirVM);
+    }
+
+    [HttpPost("excluir/{id:guid}")]
+    [ValidateAntiForgeryToken]
+    public IActionResult ExcluirConfirmado(Guid id)
+    {
+        var resultado = testeAppService.Excluir(id);
+
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
         }
 
         return RedirectToAction(nameof(Index));
@@ -196,13 +263,26 @@ public class TesteController : Controller
     [HttpGet("detalhes/{id:guid}")]
     public IActionResult Detalhes(Guid id)
     {
-        var registroSelecionado = repositorioTeste.SelecionarRegistroPorId(id);
+        var resultado = testeAppService.SelecionarPorId(id);
 
-        if (registroSelecionado is null)
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
             return RedirectToAction(nameof(Index));
+        }
 
-        var detalhesVM = DetalhesTesteViewModel.ParaDetalhesVm(registroSelecionado);
+        var detalhesVm = DetalhesTesteViewModel.ParaDetalhesVm(resultado.Value);
 
-        return View(detalhesVM);
+        return View(detalhesVm);
     }
 }

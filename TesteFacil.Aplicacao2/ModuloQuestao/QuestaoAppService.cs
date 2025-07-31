@@ -2,34 +2,28 @@
 using Microsoft.Extensions.Logging;
 using TesteFacil.Aplicacao.Compartilhado;
 using TesteFacil.Dominio.Compartilhado;
-using TesteFacil.Dominio.ModuloDisciplina;
 using TesteFacil.Dominio.ModuloMateria;
 using TesteFacil.Dominio.ModuloQuestao;
 using TesteFacil.Dominio.ModuloTeste;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TesteFacil.Aplicacao.ModuloQuestao;
 
 public class QuestaoAppService
 {
     private readonly IRepositorioQuestao repositorioQuestao;
-    private readonly IRepositorioMateria repositorioMateria;
     private readonly IRepositorioTeste repositorioTeste;
     private readonly IUnitOfWork unitOfWork;
     private readonly ILogger<QuestaoAppService> logger;
 
     public QuestaoAppService(
         IRepositorioQuestao repositorioQuestao,
-        IRepositorioMateria repositorioMateria,
         IRepositorioTeste repositorioTeste,
         IUnitOfWork unitOfWork,
         ILogger<QuestaoAppService> logger
     )
     {
         this.repositorioQuestao = repositorioQuestao;
-        this.repositorioMateria = repositorioMateria;
         this.repositorioTeste = repositorioTeste;
-
         this.unitOfWork = unitOfWork;
         this.logger = logger;
     }
@@ -37,60 +31,72 @@ public class QuestaoAppService
     public Result Cadastrar(Questao questao)
     {
         var registros = repositorioQuestao.SelecionarRegistros();
+
         if (registros.Any(i => i.Enunciado.Equals(questao.Enunciado)))
             return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Já existe uma questão registrada com este enunciado."));
+
         try
         {
             repositorioQuestao.Cadastrar(questao);
+
             unitOfWork.Commit();
+
             return Result.Ok();
         }
         catch (Exception ex)
         {
             unitOfWork.Rollback();
+
             logger.LogError(
                 ex,
                 "Ocorreu um erro durante o registro de {@Registro}.",
                 questao
             );
+
             return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
         }
     }
 
-    public Result Editar(Guid id, Questao questao)
+    public Result Editar(Guid id, Questao questaoEditada)
     {
         var registros = repositorioQuestao.SelecionarRegistros();
-        if (registros.Any(i => i.Enunciado.Equals(questao.Enunciado) && i.Id != questao.Id))
+
+        if (registros.Any(i => !i.Id.Equals(id) && i.Enunciado.Equals(questaoEditada.Enunciado)))
             return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Já existe uma questão registrada com este enunciado."));
+
         try
         {
-            repositorioQuestao.Editar(id, questao);
+            repositorioQuestao.Editar(id, questaoEditada);
+
             unitOfWork.Commit();
+
             return Result.Ok();
         }
         catch (Exception ex)
         {
             unitOfWork.Rollback();
+
             logger.LogError(
                 ex,
-                "Ocorreu um erro durante a atualização de {@Registro}.",
-                questao
+                "Ocorreu um erro durante a edição do registro {@Registro}.",
+                questaoEditada
             );
+
             return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
         }
     }
 
     public Result Excluir(Guid id)
     {
-        var questao = repositorioQuestao.SelecionarRegistroPorId(id);
         try
         {
             var testes = repositorioTeste.SelecionarRegistros();
 
-            if (testes.Any(t => t.Questoes.Any(q => q.Id.Equals(id))))
+            if (testes.Any(t => t.Questoes.Any(q => q.Id == id)))
             {
                 var erro = ResultadosErro
                     .ExclusaoBloqueadaErro("A questão não pôde ser excluída pois está em um ou mais testes ativos.");
+
                 return Result.Fail(erro);
             }
 
@@ -99,20 +105,23 @@ public class QuestaoAppService
             unitOfWork.Commit();
 
             return Result.Ok();
+
         }
         catch (Exception ex)
         {
             unitOfWork.Rollback();
+
             logger.LogError(
                 ex,
-                "Ocorreu um erro durante a exclusão de {Id}.",
+                "Ocorreu um erro durante a exclusão do registro {Id}.",
                 id
             );
+
             return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
         }
     }
 
-    public Result<Questao> SelecionarRegistroPorId(Guid id)
+    public Result<Questao> SelecionarPorId(Guid id)
     {
         try
         {
@@ -135,7 +144,7 @@ public class QuestaoAppService
         }
     }
 
-    public Result<List<Questao>> SelecionarRegistros()
+    public Result<List<Questao>> SelecionarTodos()
     {
         try
         {
@@ -148,6 +157,70 @@ public class QuestaoAppService
             logger.LogError(
                 ex,
                 "Ocorreu um erro durante a seleção de registros."
+            );
+
+            return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
+        }
+    }
+
+    public Result AdicionarAlternativaEmQuestao(Guid questaoId, string respostaAlternativa, bool alternativaCorreta)
+    {
+        var registroSelecionado = repositorioQuestao.SelecionarRegistroPorId(questaoId);
+
+        if (registroSelecionado is null)
+            return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro(questaoId));
+
+        if (registroSelecionado.Alternativas.Any(a => a.Resposta.Equals(respostaAlternativa)))
+            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Já existe uma alternativa registrada com esta resposta."));
+
+        if (alternativaCorreta && registroSelecionado.Alternativas.Any(a => a.Correta))
+            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Já existe uma alternativa registrada como correta."));
+
+        try
+        {
+            registroSelecionado.AdicionarAlternativa(respostaAlternativa, alternativaCorreta);
+
+            unitOfWork.Commit();
+
+            return Result.Ok();
+        }
+        catch (Exception ex)
+        {
+            unitOfWork.Rollback();
+
+            logger.LogError(
+                ex,
+                "Ocorreu um erro durante a edição do registro {@Registro}.",
+                registroSelecionado
+            );
+
+            return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
+        }
+    }
+
+    public Result RemoverAlternativaDeQuestao(char letra, Guid questaoId)
+    {
+        var registro = repositorioQuestao.SelecionarRegistroPorId(questaoId);
+
+        if (registro is null)
+            return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro(questaoId));
+
+        try
+        {
+            registro.RemoverAlternativa(letra);
+
+            unitOfWork.Commit();
+
+            return Result.Ok();
+        }
+        catch (Exception ex)
+        {
+            unitOfWork.Rollback();
+
+            logger.LogError(
+                ex,
+                "Ocorreu um erro durante a edição do registro {@Registro}.",
+                registro
             );
 
             return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));

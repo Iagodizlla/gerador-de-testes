@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text.Json;
-using TesteFacil.Aplicacao.ModuloDisciplina;
 using TesteFacil.Aplicacao.ModuloMateria;
 using TesteFacil.Aplicacao.ModuloQuestao;
-using TesteFacil.Dominio.Compartilhado;
-using TesteFacil.Dominio.ModuloDisciplina;
-using TesteFacil.Dominio.ModuloMateria;
 using TesteFacil.Dominio.ModuloQuestao;
 using TesteFacil.WebApp.Models;
 
@@ -17,26 +13,17 @@ public class QuestaoController : Controller
 {
     private readonly QuestaoAppService questaoAppService;
     private readonly MateriaAppService materiaAppService;
-    private readonly IUnitOfWork unitOfWork;
-    private readonly ILogger<QuestaoController> logger;
 
-    public QuestaoController(
-        QuestaoAppService repositorioQuestao,
-        MateriaAppService repositorioMateria,
-        IUnitOfWork unitOfWork,
-        ILogger<QuestaoController> logger
-    )
+    public QuestaoController(QuestaoAppService questaoAppService, MateriaAppService materiaAppService)
     {
-        this.questaoAppService = repositorioQuestao;
-        this.materiaAppService = repositorioMateria;
-        this.unitOfWork = unitOfWork;
-        this.logger = logger;
+        this.questaoAppService = questaoAppService;
+        this.materiaAppService = materiaAppService;
     }
 
     [HttpGet]
     public IActionResult Index()
     {
-        var resultado = questaoAppService.SelecionarRegistros();
+        var resultado = questaoAppService.SelecionarTodos();
 
         if (resultado.IsFailed)
         {
@@ -54,9 +41,7 @@ public class QuestaoController : Controller
             return RedirectToAction("erro", "home");
         }
 
-        var registros = resultado.Value;
-
-        var visualizarVM = new VisualizarQuestoesViewModel(registros);
+        var visualizarVM = new VisualizarQuestoesViewModel(resultado.ValueOrDefault);
 
         var existeNotificacao = TempData.TryGetValue(nameof(NotificacaoViewModel), out var valor);
 
@@ -73,11 +58,9 @@ public class QuestaoController : Controller
     [HttpGet("cadastrar")]
     public IActionResult Cadastrar()
     {
-        var materias = materiaAppService.SelecionarTodos();
+        var materias = materiaAppService.SelecionarTodos().ValueOrDefault;
 
-        var valor = materias.Value;
-
-        var cadastrarVM = new CadastrarQuestaoViewModel(valor);
+        var cadastrarVM = new CadastrarQuestaoViewModel(materias);
 
         return View(cadastrarVM);
     }
@@ -86,15 +69,9 @@ public class QuestaoController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Cadastrar(CadastrarQuestaoViewModel cadastrarVM)
     {
-        var Resultadoregistros = questaoAppService.SelecionarRegistros();
+        var materias = materiaAppService.SelecionarTodos().ValueOrDefault;
 
-        var registros = Resultadoregistros.Value;
-
-        var Resultadomaterias = materiaAppService.SelecionarTodos();
-
-        var materias = Resultadomaterias.Value;
-
-        var entidade = FormularioQuestaoViewModel.ParaEntidade(cadastrarVM, materias);
+        var entidade = CadastrarQuestaoViewModel.ParaEntidade(cadastrarVM, materias);
 
         var resultado = questaoAppService.Cadastrar(entidade);
 
@@ -125,15 +102,12 @@ public class QuestaoController : Controller
         AdicionarAlternativaQuestaoViewModel alternativaVm
     )
     {
-        var Resultadomaterias = materiaAppService.SelecionarTodos();
+        cadastrarVm.MateriasDisponiveis = materiaAppService
+            .SelecionarTodos()
+            .ValueOrDefault
+            .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
+            .ToList();
 
-        var materias = Resultadomaterias.Value;
-
-        cadastrarVm.MateriasDisponiveis = materias
-                .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
-                .ToList();
-
-        // Validação: respostas duplicadas
         if (cadastrarVm.AlternativasSelecionadas.Any(a => a.Resposta.Equals(alternativaVm.Resposta)))
         {
             ModelState.AddModelError(
@@ -144,7 +118,6 @@ public class QuestaoController : Controller
             return View(nameof(Cadastrar), cadastrarVm);
         }
 
-        // Validação: apenas uma alternativa correta
         if (alternativaVm.Correta && cadastrarVm.AlternativasSelecionadas.Any(a => a.Correta))
         {
             ModelState.AddModelError(
@@ -169,13 +142,11 @@ public class QuestaoController : Controller
         if (alternativa is not null)
             cadastrarVm.RemoverAlternativa(alternativa);
 
-        var Resultadomaterias = materiaAppService.SelecionarTodos();
-
-        var materias = Resultadomaterias.Value;
-
-        cadastrarVm.MateriasDisponiveis = materias
-                .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
-                .ToList();
+        cadastrarVm.MateriasDisponiveis = materiaAppService
+            .SelecionarTodos()
+            .ValueOrDefault
+            .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
+            .ToList();
 
         return View(nameof(Cadastrar), cadastrarVm);
     }
@@ -183,15 +154,11 @@ public class QuestaoController : Controller
     [HttpGet("editar/{id:guid}")]
     public IActionResult Editar(Guid id)
     {
-        var resultadoMaterias = materiaAppService.SelecionarTodos();
+        var resultado = questaoAppService.SelecionarPorId(id);
 
-        var materias = resultadoMaterias.Value;
-
-        var resultadoQuestao = questaoAppService.SelecionarRegistroPorId(id);
-
-        if (resultadoQuestao.IsFailed)
+        if (resultado.IsFailed)
         {
-            foreach (var erro in resultadoQuestao.Errors)
+            foreach (var erro in resultado.Errors)
             {
                 var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
                     erro.Message,
@@ -205,28 +172,28 @@ public class QuestaoController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var registroSelecionado = resultadoQuestao.Value;
+        var materias = materiaAppService.SelecionarTodos().ValueOrDefault;
 
-        var editarVM = new EditarQuestaoViewModel(
-            id,
-            registroSelecionado.Enunciado,
-            registroSelecionado.Materia.Id,
-            registroSelecionado.Alternativas,
+        var registro = resultado.Value;
+
+        var editarVm = new EditarQuestaoViewModel(
+            registro.Id,
+            registro.Enunciado,
+            registro.Materia.Id,
+            registro.Alternativas,
             materias
         );
 
-        return View(editarVM);
+        return View(editarVm);
     }
 
     [HttpPost("editar/{id:guid}")]
     [ValidateAntiForgeryToken]
     public IActionResult Editar(Guid id, EditarQuestaoViewModel editarVm)
     {
-        var resultadoMaterias = materiaAppService.SelecionarTodos();
+        var materias = materiaAppService.SelecionarTodos().ValueOrDefault;
 
-        var materias = resultadoMaterias.Value;
-
-        var entidadeEditada = FormularioQuestaoViewModel.ParaEntidade(editarVm, materias);
+        var entidadeEditada = EditarQuestaoViewModel.ParaEntidade(editarVm, materias);
 
         var resultado = questaoAppService.Editar(id, entidadeEditada);
 
@@ -252,50 +219,37 @@ public class QuestaoController : Controller
     }
 
     [HttpPost("editar/{id:guid}/adicionar-alternativa")]
-    public IActionResult AdicionarAlternativa(
-       EditarQuestaoViewModel editarVm,
-       AdicionarAlternativaQuestaoViewModel alternativaVm
-   )
+    public IActionResult AdicionarAlternativa(EditarQuestaoViewModel editarVm, AdicionarAlternativaQuestaoViewModel alternativaVm)
     {
-        var Resultadomaterias = materiaAppService.SelecionarTodos();
+        var resultado = questaoAppService.AdicionarAlternativaEmQuestao(
+            editarVm.Id,
+            alternativaVm.Resposta,
+            alternativaVm.Correta
+        );
 
-        var materias = Resultadomaterias.Value;
+        var materias = materiaAppService
+            .SelecionarTodos()
+            .ValueOrDefault
+            .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
+            .ToList();
 
-        editarVm.MateriasDisponiveis = materias
-                .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
-                .ToList();
+        editarVm.MateriasDisponiveis = materias;
 
-        if (editarVm.AlternativasSelecionadas.Any(a => a.Resposta.Equals(alternativaVm.Resposta)))
+        if (resultado.IsFailed)
         {
-            ModelState.AddModelError(
-                "CadastroUnico",
-                "Já existe uma alternativa registrada com esta resposta."
-            );
+            foreach (var erro in resultado.Errors)
+            {
+                if (erro.Metadata["TipoErro"].ToString() == "RegistroDuplicado")
+                {
+                    ModelState.AddModelError("CadastroUnico", erro.Reasons[0].Message);
+                    break;
+                }
+            }
 
-            return View(nameof(Editar), editarVm);
-        }
-
-        if (alternativaVm.Correta && editarVm.AlternativasSelecionadas.Any(a => a.Correta))
-        {
-            ModelState.AddModelError(
-                "CadastroUnico",
-                "Já existe uma alternativa registrada como correta."
-            );
-
-            return View(nameof(Editar), editarVm);
+            return View(editarVm);
         }
 
         editarVm.AdicionarAlternativa(alternativaVm);
-
-        var Resultadoregistro = questaoAppService.SelecionarRegistroPorId(editarVm.Id);
-        var registro = Resultadoregistro.Value;
-
-        if (registro is null)
-            return RedirectToAction(nameof(Index));
-
-        registro.AdicionarAlternativa(alternativaVm.Resposta, alternativaVm.Correta);
-
-        unitOfWork.Commit();
 
         return View(nameof(Editar), editarVm);
     }
@@ -303,31 +257,22 @@ public class QuestaoController : Controller
     [HttpPost("editar/{id:guid}/remover-alternativa/{letra:alpha}")]
     public IActionResult RemoverAlternativa(char letra, EditarQuestaoViewModel editarVm)
     {
-        var Resultadomaterias = materiaAppService.SelecionarTodos();
+        var resultado = questaoAppService.RemoverAlternativaDeQuestao(letra, editarVm.Id);
 
-        var materias = Resultadomaterias.Value;
+        editarVm.MateriasDisponiveis = materiaAppService
+            .SelecionarTodos()
+            .ValueOrDefault
+            .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
+            .ToList();
 
-        editarVm.MateriasDisponiveis = materias
-                .Select(d => new SelectListItem(d.Nome, d.Id.ToString()))
-                .ToList();
+        if (resultado.IsFailed)
+            return View(nameof(Editar), editarVm);
 
         var alternativa = editarVm.AlternativasSelecionadas
             .Find(a => a.Letra.Equals(letra));
 
         if (alternativa is not null)
-        {
-            var Resultadoregistro = questaoAppService.SelecionarRegistroPorId(editarVm.Id);
-            var registro = Resultadoregistro.Value;
-
-            if (registro is null)
-                return RedirectToAction(nameof(Index));
-
             editarVm.RemoverAlternativa(alternativa);
-
-            registro.RemoverAlternativa(letra);
-
-            unitOfWork.Commit();
-        }
 
         return View(nameof(Editar), editarVm);
     }
@@ -335,7 +280,7 @@ public class QuestaoController : Controller
     [HttpGet("excluir/{id:guid}")]
     public IActionResult Excluir(Guid id)
     {
-        var resultado = questaoAppService.SelecionarRegistroPorId(id);
+        var resultado = questaoAppService.SelecionarPorId(id);
 
         if (resultado.IsFailed)
         {
@@ -353,11 +298,11 @@ public class QuestaoController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var registroSelecionado = resultado.Value;
+        var registro = resultado.Value;
 
         var excluirVM = new ExcluirQuestaoViewModel(
-            registroSelecionado.Id,
-            registroSelecionado.Enunciado
+            registro.Id,
+            registro.Enunciado
         );
 
         return View(excluirVM);
@@ -389,7 +334,7 @@ public class QuestaoController : Controller
     [HttpGet("detalhes/{id:guid}")]
     public IActionResult Detalhes(Guid id)
     {
-        var resultado = questaoAppService.SelecionarRegistroPorId(id);
+        var resultado = questaoAppService.SelecionarPorId(id);
 
         if (resultado.IsFailed)
         {
