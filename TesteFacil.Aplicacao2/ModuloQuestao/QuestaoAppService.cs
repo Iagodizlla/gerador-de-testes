@@ -229,4 +229,20 @@ public class QuestaoAppService
             return Result.Fail(ResultadosErro.ExcecaoInternaErro(ex));
         }
     }
+
+    public Result ValidarAlternativaQuestao(Guid questaoId, string respostaAlternativa, bool alternativaCorreta)
+    {
+        var registroSelecionado = repositorioQuestao.SelecionarRegistroPorId(questaoId);
+
+        if (registroSelecionado is null)
+            return Result.Fail(ResultadosErro.RegistroNaoEncontradoErro(questaoId));
+
+        if (registroSelecionado.Alternativas.Any(a => a.Resposta.Equals(respostaAlternativa)))
+            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Já existe uma alternativa registrada com esta resposta."));
+
+        if (alternativaCorreta && registroSelecionado.Alternativas.Any(a => a.Correta))
+            return Result.Fail(ResultadosErro.RegistroDuplicadoErro("Já existe uma alternativa registrada como correta."));
+
+        return Result.Ok();
+    }
 }
