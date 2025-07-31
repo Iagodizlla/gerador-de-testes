@@ -10,6 +10,7 @@ using TesteFacil.Infraestrutura.Orm.ModuloDisciplina;
 using TesteFacil.Infraestrutura.Orm.ModuloMateria;
 using TesteFacil.Infraestrutura.Orm.ModuloQuestao;
 using TesteFacil.Infraestrutura.Orm.ModuloTeste;
+using TesteFacil.Infraestrutura.Pdf;
 using TesteFacil.WebApp.ActionFilters;
 using TesteFacil.WebApp.DependencyInjection;
 using TesteFacil.WebApp.Orm;
@@ -28,6 +29,7 @@ public class Program
             builder.Services.AddScoped<MateriaAppService>();
             builder.Services.AddScoped<QuestaoAppService>();
             builder.Services.AddScoped<TesteAppService>();
+            builder.Services.AddScoped<IGeradorTeste, GeradorTesteEmPdf>();
             builder.Services.AddScoped<IRepositorioDisciplina, RepositorioDisciplinaEmOrm>();
             builder.Services.AddScoped<IRepositorioMateria, RepositorioMateriaEmOrm>();
             builder.Services.AddScoped<IRepositorioQuestao, RepositorioQuestaoEmOrm>();

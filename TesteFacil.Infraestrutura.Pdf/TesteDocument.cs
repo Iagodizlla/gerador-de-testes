@@ -6,12 +6,12 @@ using TesteFacil.Dominio.ModuloTeste;
 
 namespace TesteFacil.Infraestrutura.Pdf;
 
-public class ImpressaoTesteDocument : IDocument
+public class TesteDocument : IDocument
 {
     public Teste Model { get; }
     public bool Gabarito { get; }
 
-    public ImpressaoTesteDocument(Teste model, bool gabarito = false)
+    public TesteDocument(Teste model, bool gabarito = false)
     {
         QuestPDF.Settings.License = LicenseType.Community;
 
@@ -26,7 +26,6 @@ public class ImpressaoTesteDocument : IDocument
             {
                 page.Header().Height(50).Background("#0D6EFD").Element(ComposeHeader);
                 page.Content().Background(Colors.Grey.Lighten3).Element(ComposeContent);
-                //page.Footer().Height(50).Background(Colors.Grey.Lighten1);
             });
     }
 
