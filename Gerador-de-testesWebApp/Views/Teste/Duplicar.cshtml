@@ -1,0 +1,141 @@
+﻿@using TesteFacil.Dominio.ModuloMateria
+
+@model DuplicarTesteViewModel
+
+@{
+    ViewBag.Titulo = "Duplicação de Teste";
+}
+
+<hr />
+<div class="row justify-content-center my-5">
+    <div class="col-md-8">
+        <div class="card rounded-4 border-0">
+            <div class="card-body p-md-5">
+                <form asp-action="ConfirmarDuplicacao" asp-route-id="@Model.TesteId">
+                    <h3>Formulário de Duplicação de Teste</h3>
+
+                    @if (ViewData.ModelState["CadastroUnico"]?.Errors.Count > 0)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+                            @ViewData.ModelState["CadastroUnico"]!.Errors.First().ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <div class="form-group d-grid gap-2 mt-3">
+                        <label asp-for="Titulo" class="control-label fs-5">Titulo:</label>
+                        <input asp-for="Titulo" class="form-control" />
+                        <span asp-validation-for="Titulo" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <label class="fw-semibold">Disciplina:</label>
+                        <span>@Model.Disciplina</span>
+                        <input type="hidden" asp-for="Disciplina" />
+                        <input type="hidden" asp-for="DisciplinaId" />
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <label class="fw-semibold">Série:</label>
+                        <span>@Model.NomeSerie</span>
+                        <input type="hidden" asp-for="NomeSerie" />
+                        <input type="hidden" asp-for="Serie" />
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <label class="fw-semibold">Quantidade de Questões:</label>
+                        <span>@Model.QuantidadeQuestoes</span>
+                        <input type="hidden" asp-for="QuantidadeQuestoes" />
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <label class="fw-semibold">Recuperação:</label>
+                        <span>@(Model.Recuperacao ? "Sim" : "Não")</span>
+                        @Html.CheckBoxFor(x => x.Recuperacao, new { @class = "form-check-input", @type = "hidden" })
+                    </div>
+
+                    <div class="row justify-content-end align-items-end g-3 mt-3">
+                        @if (!Model.Recuperacao)
+                        {
+                            <div class="col-9">
+                                <label for="MateriaId" class="form-label">Matéria:</label>
+                                <select asp-for="MateriaId" asp-items="@Model.MateriasDisponiveis" class="form-select"></select>
+                            </div>
+
+                            <div class="col d-flex align-items-end">
+                                <button class="btn btn-outline-primary w-100"
+                                        type="submit"
+                                        formaction="/testes/duplicar/@Model.TesteId/sortear-questoes">
+                                    Sortear Questões
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-3 d-flex align-items-end">
+                                <button class="btn btn-outline-primary w-100"
+                                        type="submit"
+                                        formaction="/testes/duplicar/@Model.TesteId/sortear-questoes">
+                                    Sortear Questões
+                                </button>
+                            </div>
+                        }
+                    </div>
+
+                    @if (Model.QuestoesSorteadas.Any())
+                    {
+
+                        @* Reenvia alternativas já adicionadas *@
+                        @for (int i = 0; i < Model.QuestoesSorteadas.Count; i++)
+                        {
+                            <input type="hidden" asp-for="QuestoesSorteadas[@i].Id" />
+                            <input type="hidden" asp-for="QuestoesSorteadas[@i].Enunciado" />
+                            <input type="hidden" asp-for="QuestoesSorteadas[@i].RespostaCorreta" />
+                        }
+
+                        <hr class="my-3" />
+
+                        <h4>Questões</h4>
+
+                        <div class="table-responsive mt-4">
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Matéria</th>
+                                        <th>Enunciado</th>
+                                        <th>Resposta</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var q in Model.QuestoesSorteadas)
+                                    {
+                                        <tr>
+                                            <td valign="middle" style="width: 75px;">
+                                                @q.Materia
+                                            </td>
+                                            <td valign="middle" style="width: 75px;">
+                                                @q.Enunciado
+                                            </td>
+                                            <td valign="middle" style="width: 75px;">
+                                                @q.RespostaCorreta
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+                    <div class="form-group d-flex align-items-center justify-content-end gap-3 mt-5">
+                        <a asp-action="Index">Voltar para a listagem</a>
+                        <button type="submit" class="btn btn-primary rounded-3 px-5">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

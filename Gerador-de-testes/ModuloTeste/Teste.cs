@@ -98,8 +98,12 @@ public class Teste : EntidadeBase<Teste>
 
     public void RemoverQuestoesAtuais()
     {
-        foreach (var questao in Questoes)
+        for (int i = 0; i < Questoes.Count; i++)
+        {
+            var questao = Questoes[i];
+
             RemoverQuestao(questao);
+        }
     }
 
     public override void AtualizarRegistro(Teste registroEditado)

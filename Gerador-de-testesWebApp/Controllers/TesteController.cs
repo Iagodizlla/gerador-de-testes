@@ -263,6 +263,60 @@ public class TesteController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet("duplicar/{id:guid}")]
+    public IActionResult Duplicar(Guid id)
+    {
+        var resultado = testeAppService.SelecionarPorId(id);
+
+        if (resultado.IsFailed)
+        {
+            foreach (var erro in resultado.Errors)
+            {
+                var notificacaoJson = NotificacaoViewModel.GerarNotificacaoSerializada(
+                    erro.Message,
+                    erro.Reasons[0].Message
+                );
+
+                TempData.Add(nameof(NotificacaoViewModel), notificacaoJson);
+                break;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        var registro = resultado.Value;
+
+        var disciplinas = disciplinaAppService.SelecionarTodos().ValueOrDefault;
+        var questoes = questaoAppService.SelecionarTodos().ValueOrDefault;
+
+        var materiasFiltradas = materiaAppService
+            .SelecionarTodos()
+            .ValueOrDefault
+            .Where(m => m.Disciplina.Equals(registro.Disciplina))
+            .Where(m => m.Serie.Equals(registro.Serie))
+            .ToList();
+
+        var duplicarVm = new DuplicarTesteViewModel
+        {
+            TesteId = registro.Id,
+            Titulo = string.Empty,
+
+            DisciplinaId = registro.Disciplina.Id,
+            Disciplina = registro.Disciplina.Nome,
+
+            Serie = registro.Serie,
+            NomeSerie = registro.Serie.GetDisplayName() ?? registro.Serie.ToString(),
+            QuantidadeQuestoes = registro.QuantidadeQuestoes,
+            Recuperacao = registro.Recuperacao,
+
+            MateriasDisponiveis = materiasFiltradas
+                .Select(m => new SelectListItem(m.Nome, m.Id.ToString()))
+                .ToList()
+        };
+
+        return View(duplicarVm);
+    }
+
     [HttpGet("detalhes/{id:guid}")]
     public IActionResult Detalhes(Guid id)
     {

@@ -25,7 +25,7 @@
     </div>
 }
 
-<div class="row g-1">
+<div class="row flex-wrap gap-2">
     @foreach (var registro in Model.Registros)
     {
         <div class="col-12 col-md-3">
@@ -42,6 +42,9 @@
                     </p>
 
                     <span class="d-flex gap-1 justify-content-end mt-4">
+                        <a asp-action="Duplicar" asp-route-id="@registro.Id" class="btn btn-secondary rounded-circle card-option" title="Duplicar">
+                            <i class="bi bi-copy"></i>
+                        </a>
                         <a asp-action="Detalhes" asp-route-id="@registro.Id" class="btn btn-secondary rounded-circle card-option" title="Detalhes">
                             <i class="bi bi-search"></i>
                         </a>
