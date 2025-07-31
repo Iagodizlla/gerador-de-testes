@@ -12,18 +12,21 @@ public class QuestaoAppService
 {
     private readonly IRepositorioQuestao repositorioQuestao;
     private readonly IRepositorioTeste repositorioTeste;
+    private readonly IGeradorTeste geradorTeste;
     private readonly IUnitOfWork unitOfWork;
     private readonly ILogger<QuestaoAppService> logger;
 
     public QuestaoAppService(
         IRepositorioQuestao repositorioQuestao,
         IRepositorioTeste repositorioTeste,
+        IGeradorTeste geradorTeste,
         IUnitOfWork unitOfWork,
         ILogger<QuestaoAppService> logger
     )
     {
         this.repositorioQuestao = repositorioQuestao;
         this.repositorioTeste = repositorioTeste;
+        this.geradorTeste = geradorTeste;
         this.unitOfWork = unitOfWork;
         this.logger = logger;
     }

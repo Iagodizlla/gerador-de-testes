@@ -5,7 +5,10 @@ using TesteFacil.Aplicacao.ModuloDisciplina;
 using TesteFacil.Aplicacao.ModuloMateria;
 using TesteFacil.Aplicacao.ModuloQuestao;
 using TesteFacil.Aplicacao.ModuloTeste;
+using QuestPDF.Fluent;
+using TesteFacil.Infraestrutura.Pdf;
 using TesteFacil.Dominio.Extensions;
+using TesteFacil.Dominio.ModuloTeste;
 using TesteFacil.WebApp.Models;
 
 namespace TesteFacil.WebApp.Controllers;
@@ -284,5 +287,27 @@ public class TesteController : Controller
         var detalhesVm = DetalhesTesteViewModel.ParaDetalhesVm(resultado.Value);
 
         return View(detalhesVm);
+    }
+
+    [HttpGet("gerar-pdf/{id:guid}")]
+    public IActionResult GerarPdf(Guid id)
+    {
+        var resultado = testeAppService.GerarPdf(id);
+
+        if (resultado.IsFailed)
+            return RedirectToAction(nameof(Index));
+
+        return File(resultado.Value, "application/pdf");
+    }
+
+    [HttpGet("gerar-pdf/gabarito/{id:guid}")]
+    public IActionResult GerarPdfGabarito(Guid id)
+    {
+        var resultado = testeAppService.GerarPdf(id, gabarito: true);
+
+        if (resultado.IsFailed)
+            return RedirectToAction(nameof(Index));
+
+        return File(resultado.Value, "application/pdf");
     }
 }

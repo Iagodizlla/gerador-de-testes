@@ -29,6 +29,7 @@
     <ProjectReference Include="..\Gerador-de-testes.Infraestrutura.Orm\TesteFacil.Infraestrutura.csproj" />
     <ProjectReference Include="..\Gerador-de-testes\TesteFacil.Dominio.csproj" />
     <ProjectReference Include="..\TesteFacil.Aplicacao2\TesteFacil.Aplicacao.csproj" />
+    <ProjectReference Include="..\TesteFacil.Infraestrutura.Pdf\TesteFacil.Infraestrutura.Pdf.csproj" />
   </ItemGroup>
 
 </Project>
