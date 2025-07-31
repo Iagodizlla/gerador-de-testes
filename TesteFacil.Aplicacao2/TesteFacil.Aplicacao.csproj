@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Gerador-de-testes\TesteFacil.Dominio.csproj" />
+    <ProjectReference Include="..\TesteFacil.Infraestrutura.Pdf\TesteFacil.Infraestrutura.Pdf.csproj" />
   </ItemGroup>
 
 </Project>
