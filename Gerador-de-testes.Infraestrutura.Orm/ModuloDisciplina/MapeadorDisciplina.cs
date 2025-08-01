@@ -17,6 +17,7 @@ public class MapeadorDisciplinaEmOrm : IEntityTypeConfiguration<Disciplina>
             .IsRequired();
 
         builder.HasMany(d => d.Materias)
-            .WithOne(m => m.Disciplina);
+            .WithOne(m => m.Disciplina)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

@@ -21,6 +21,7 @@ public class RepositorioDisciplinaEmOrm : RepositorioBaseEmOrm<Disciplina>, IRep
     {
         return registros
             .Include(x => x.Materias)
+            .OrderBy(x => x.Nome)
             .ToList();
     }
 }
