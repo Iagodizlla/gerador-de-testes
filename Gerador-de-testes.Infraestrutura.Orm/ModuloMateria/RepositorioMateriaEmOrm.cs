@@ -21,6 +21,7 @@ public class RepositorioMateriaEmOrm : RepositorioBaseEmOrm<Materia>, IRepositor
     {
         return registros
             .Include(x => x.Disciplina)
+            .OrderBy(x => x.Nome)
             .ToList();
     }
 }
