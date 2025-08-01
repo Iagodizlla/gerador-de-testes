@@ -11,15 +11,16 @@ public class GeradorQuestoesGemini : IGeradorQuestoes
 {
     private readonly HttpClient _httpClient;
 
-    private readonly string _geminiEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=";
-    private readonly string _geminiApiKey;
+    private readonly string _geminiEndpoint;
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true };
 
     public GeradorQuestoesGemini(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _httpClient = httpClientFactory.CreateClient();
-        _geminiApiKey = configuration["GEMINI_API_KEY"] ?? string.Empty;
+
+        _geminiEndpoint = string.Concat("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=",
+            configuration["GEMINI_API_KEY"]);
     }
 
     public async Task<List<Questao>> GerarQuestoesAsync(Materia materia, int quantidade)
@@ -60,7 +61,7 @@ public class GeradorQuestoesGemini : IGeradorQuestoes
 
         var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
 
-        var response = await _httpClient.PostAsync($"{_geminiEndpoint}{_geminiApiKey}", content);
+        var response = await _httpClient.PostAsync(_geminiEndpoint, content);
 
         response.EnsureSuccessStatusCode();
 
@@ -75,16 +76,7 @@ public class GeradorQuestoesGemini : IGeradorQuestoes
                       .GetProperty("text")
                       .GetString();
 
-        text = text?.Trim() ?? string.Empty;
-
-        if (text.StartsWith("```json"))
-        {
-            text = text.Replace("```json", "").Trim();
-        }
-        if (text.EndsWith("```"))
-        {
-            text = text.Substring(0, text.LastIndexOf("```")).Trim();
-        }
+        text = ProcessarTexto(text);
 
         if (string.IsNullOrWhiteSpace(text))
             throw new Exception("Não foi possível reconhecer o formato de resposta do modelo.");
@@ -106,5 +98,21 @@ public class GeradorQuestoesGemini : IGeradorQuestoes
         }
 
         return resultado;
+    }
+
+    private static string ProcessarTexto(string? text)
+    {
+        text = text?.Trim() ?? string.Empty;
+
+        if (text.StartsWith("```json"))
+        {
+            text = text.Replace("```json", "").Trim();
+        }
+        if (text.EndsWith("```"))
+        {
+            text = text.Substring(0, text.LastIndexOf("```")).Trim();
+        }
+
+        return text;
     }
 }
