@@ -1,28 +1,13 @@
 ﻿using TesteFacil.Dominio.ModuloDisciplina;
-using TesteFacil.Infraestrutura.Orm.Compartilhado;
-using TesteFacil.Infraestrutura.Orm.ModuloDisciplina;
 using TesteFacil.Testes.Integracao.Compartilhado;
-using Testcontainers.MsSql;
 
 namespace TesteFacil.Testes.Integracao.ModuloDisciplina;
 
 [TestClass]
 [TestCategory("Testes de Integração de Disciplina")]
-public sealed class RepositorioDisciplinaEmOrmTests
+public sealed class RepositorioDisciplinaEmOrmTests : RepositorioBaseEmOrmTests
 {
-    private TesteFacilDbContext? dbContext;
-    private RepositorioDisciplinaEmOrm repositorioDisciplina;
-
-    [TestInitialize]
-    public void ConfigurarTestes()
-    {
-        dbContext = AssemblyConfig.DbContextFactory?.CriarDbContext();
-
-        if (dbContext is null)
-            throw new ArgumentNullException("DbContextFactory não inicializada");
-
-        repositorioDisciplina = new RepositorioDisciplinaEmOrm(dbContext);
-    }
+    
 
     [TestMethod]
     public void Deve_Cadastrar_Disciplina_Corretamente()
@@ -31,11 +16,11 @@ public sealed class RepositorioDisciplinaEmOrmTests
         var disciplina = new Disciplina("Matemática");
 
         // Act
-        repositorioDisciplina.Cadastrar(disciplina);
+        repositorioDisciplina?.Cadastrar(disciplina);
         dbContext?.SaveChanges();
 
         // Assert
-        var registroSelecionado = repositorioDisciplina.SelecionarRegistroPorId(disciplina.Id);
+        var registroSelecionado = repositorioDisciplina?.SelecionarRegistroPorId(disciplina.Id);
 
         Assert.AreEqual(disciplina, registroSelecionado);
     }
@@ -45,17 +30,17 @@ public sealed class RepositorioDisciplinaEmOrmTests
     {
         // Arrange
         var disciplina = new Disciplina("Matemática");
-        repositorioDisciplina.Cadastrar(disciplina);
+        repositorioDisciplina?.Cadastrar(disciplina);
         dbContext?.SaveChanges();
 
         var disciplinaEditada = new Disciplina("Física");
 
         // Act
-        var conseguiuEditar = repositorioDisciplina.Editar(disciplina.Id, disciplinaEditada);
+        var conseguiuEditar = repositorioDisciplina?.Editar(disciplina.Id, disciplinaEditada);
         dbContext?.SaveChanges();
 
         // Assert
-        var registroSelecionado = repositorioDisciplina.SelecionarRegistroPorId(disciplina.Id);
+        var registroSelecionado = repositorioDisciplina?.SelecionarRegistroPorId(disciplina.Id);
 
         Assert.IsTrue(conseguiuEditar);
         Assert.AreEqual(disciplina, registroSelecionado);
@@ -66,15 +51,15 @@ public sealed class RepositorioDisciplinaEmOrmTests
     {
         // Arrange
         var disciplina = new Disciplina("Matemática");
-        repositorioDisciplina.Cadastrar(disciplina);
+        repositorioDisciplina?.Cadastrar(disciplina);
         dbContext?.SaveChanges();
 
         // Act
-        var conseguiuExcluir = repositorioDisciplina.Excluir(disciplina.Id);
+        var conseguiuExcluir = repositorioDisciplina?.Excluir(disciplina.Id);
         dbContext?.SaveChanges();
 
         // Assert
-        var registroSelecionado = repositorioDisciplina.SelecionarRegistroPorId(disciplina.Id);
+        var registroSelecionado = repositorioDisciplina?.SelecionarRegistroPorId(disciplina.Id);
 
         Assert.IsTrue(conseguiuExcluir);
         Assert.IsNull(registroSelecionado);
@@ -88,9 +73,9 @@ public sealed class RepositorioDisciplinaEmOrmTests
         var disciplina2 = new Disciplina("Ciências");
         var disciplina3 = new Disciplina("Geografia");
 
-        repositorioDisciplina.Cadastrar(disciplina);
-        repositorioDisciplina.Cadastrar(disciplina2);
-        repositorioDisciplina.Cadastrar(disciplina3);
+        repositorioDisciplina?.Cadastrar(disciplina);
+        repositorioDisciplina?.Cadastrar(disciplina2);
+        repositorioDisciplina?.Cadastrar(disciplina3);
 
         dbContext?.SaveChanges();
 
@@ -101,8 +86,7 @@ public sealed class RepositorioDisciplinaEmOrmTests
             .ToList();
 
         // Act - Ação
-        var disciplinasRecebidas = repositorioDisciplina
-            .SelecionarRegistros();
+        var disciplinasRecebidas = repositorioDisciplina?.SelecionarRegistros();
 
         // Assert - Asseção
         CollectionAssert.AreEqual(disciplinasEsperadasOrdenadas, disciplinasRecebidas);

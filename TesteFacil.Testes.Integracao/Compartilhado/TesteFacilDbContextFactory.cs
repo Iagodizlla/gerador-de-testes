@@ -4,11 +4,11 @@ using TesteFacil.Infraestrutura.Orm.Compartilhado;
 
 namespace TesteFacil.Testes.Integracao.Compartilhado;
 
-public class TesteDbContextFactory
+public class TesteFacilDbContextFactory
 {
     private readonly MsSqlContainer container;
 
-    public TesteDbContextFactory()
+    public TesteFacilDbContextFactory()
     {
         container = new MsSqlBuilder()
             .WithImage("mcr.microsoft.com/mssql/server:2019-latest")
