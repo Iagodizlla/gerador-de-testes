@@ -3,16 +3,21 @@ using TesteFacil.Dominio.ModuloDisciplina;
 using TesteFacil.Infraestrutura.Orm.Compartilhado;
 using TesteFacil.Infraestrutura.Orm.ModuloDisciplina;
 using TesteFacil.Infraestrutura.Orm.ModuloMateria;
+using TesteFacil.Infraestrutura.Orm.ModuloQuestao;
+using TesteFacil.Infraestrutura.Orm.ModuloTeste;
 
 namespace TesteFacil.Testes.Integracao.Compartilhado;
 
 [TestClass]
-public abstract class RepositorioBaseEmOrmTests
+public class TestFixture
 {
     private static TesteFacilDbContextFactory? factory;
     protected TesteFacilDbContext? dbContext;
-    protected RepositorioDisciplinaEmOrm? repositorioDisciplina;
+    protected RepositorioTesteEmOrm? repositorioTeste;
+    protected RepositorioQuestaoEmOrm? repositorioQuestao;
     protected RepositorioMateriaEmOrm? repositorioMateria;
+    protected RepositorioDisciplinaEmOrm? repositorioDisciplina;
+
 
     [AssemblyInitialize]
     public static async Task Setup(TestContext _)
@@ -23,7 +28,7 @@ public abstract class RepositorioBaseEmOrmTests
     }
 
     [AssemblyCleanup]
-    public static async Task Cleanup()
+    public static async Task Teardown()
     {
         if (factory is not null)
             await factory.EncerrarAsync();
@@ -37,17 +42,26 @@ public abstract class RepositorioBaseEmOrmTests
         if (dbContext is null)
             throw new ArgumentNullException("DbContextFactory não inicializada");
 
+        ConfigurarTabelas(dbContext);
+
+        repositorioTeste = new RepositorioTesteEmOrm(dbContext);
+        repositorioQuestao = new RepositorioQuestaoEmOrm(dbContext);
         repositorioDisciplina = new RepositorioDisciplinaEmOrm(dbContext);
         repositorioMateria = new RepositorioMateriaEmOrm(dbContext);
 
         BuilderSetup.SetCreatePersistenceMethod<Disciplina>(repositorioDisciplina.Cadastrar);
-        BuilderSetup.SetCreatePersistenceMethod<IList<Disciplina>>(CadastrarDisciplinas);
+        BuilderSetup.SetCreatePersistenceMethod<IList<Disciplina>>(repositorioDisciplina.CadastrarEntidades);
     }
 
-    private void CadastrarDisciplinas(IList<Disciplina> disciplinas)
+    private static void ConfigurarTabelas(TesteFacilDbContext dbContext)
     {
-        dbContext?.Disciplinas.AddRange(disciplinas);
+        dbContext.Database.EnsureCreated();
 
-        dbContext?.SaveChanges();
+        dbContext.Testes.RemoveRange(dbContext.Testes);
+        dbContext.Questoes.RemoveRange(dbContext.Questoes);
+        dbContext.Materias.RemoveRange(dbContext.Materias);
+        dbContext.Disciplinas.RemoveRange(dbContext.Disciplinas);
+
+        dbContext.SaveChanges();
     }
 }

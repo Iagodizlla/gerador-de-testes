@@ -5,7 +5,7 @@ namespace TesteFacil.Testes.Integracao.ModuloDisciplina;
 
 [TestClass]
 [TestCategory("Testes de Integração de Disciplina")]
-public sealed class RepositorioDisciplinaEmOrmTests : RepositorioBaseEmOrmTests
+public sealed class RepositorioDisciplinaEmOrmTests : TestFixture
 {
     
 

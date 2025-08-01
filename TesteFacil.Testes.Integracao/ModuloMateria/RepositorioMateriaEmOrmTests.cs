@@ -7,7 +7,7 @@ namespace TesteFacil.Testes.Integracao.ModuloMateria;
 
 [TestClass]
 [TestCategory("Testes de Integração de Matéria")]
-public class RepositorioMateriaEmOrmTests : RepositorioBaseEmOrmTests
+public class RepositorioMateriaEmOrmTests : TestFixture
 {
     [TestMethod]
     public void Deve_Cadastrar_Materia_Corretamente()

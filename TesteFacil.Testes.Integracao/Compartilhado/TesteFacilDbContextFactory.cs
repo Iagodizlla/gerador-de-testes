@@ -38,20 +38,6 @@ public class TesteFacilDbContextFactory
 
         var dbContext = new TesteFacilDbContext(options);
 
-        ConfigurarDbContext(dbContext);
-
         return dbContext;
-    }
-
-    private static void ConfigurarDbContext(TesteFacilDbContext dbContext)
-    {
-        dbContext.Database.EnsureCreated();
-
-        dbContext.Testes.RemoveRange(dbContext.Testes);
-        dbContext.Questoes.RemoveRange(dbContext.Questoes);
-        dbContext.Materias.RemoveRange(dbContext.Materias);
-        dbContext.Disciplinas.RemoveRange(dbContext.Disciplinas);
-
-        dbContext.SaveChanges();
     }
 }
