@@ -82,13 +82,10 @@ public class RepositorioMateriaEmOrmTests : TestFixture
         var materia2 = new Materia("Álgebra Linear", SerieMateria.PrimeiraSerie, disciplinas[1]);
         var materia3 = new Materia("Cálculo Numérico", SerieMateria.PrimeiraSerie, disciplinas[2]);
 
-        repositorioMateria?.Cadastrar(materia);
-        repositorioMateria?.Cadastrar(materia2);
-        repositorioMateria?.Cadastrar(materia3);
-
-        dbContext?.SaveChanges();
-
         List<Materia> materiasEsperadas = [materia, materia2, materia3];
+
+        repositorioMateria?.CadastrarEntidades(materiasEsperadas);
+        dbContext?.SaveChanges();
 
         var materiasEsperadasOrdenadas = materiasEsperadas
             .OrderBy(d => d.Nome)

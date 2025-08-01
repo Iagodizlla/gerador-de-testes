@@ -73,13 +73,10 @@ public sealed class RepositorioDisciplinaEmOrmTests : TestFixture
         var disciplina2 = new Disciplina("Ciências");
         var disciplina3 = new Disciplina("Geografia");
 
-        repositorioDisciplina?.Cadastrar(disciplina);
-        repositorioDisciplina?.Cadastrar(disciplina2);
-        repositorioDisciplina?.Cadastrar(disciplina3);
-
-        dbContext?.SaveChanges();
-
         List<Disciplina> disciplinasEsperadas = [disciplina, disciplina2, disciplina3];
+
+        repositorioDisciplina?.CadastrarEntidades(disciplinasEsperadas);
+        dbContext?.SaveChanges();
 
         var disciplinasEsperadasOrdenadas = disciplinasEsperadas
             .OrderBy(d => d.Nome)
