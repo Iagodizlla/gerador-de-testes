@@ -2,6 +2,7 @@
 using TesteFacil.Infraestrutura.Orm.Compartilhado;
 using TesteFacil.Infraestrutura.Orm.ModuloDisciplina;
 using TesteFacil.Testes.Integracao.Compartilhado;
+using Testcontainers.MsSql;
 
 namespace TesteFacil.Testes.Integracao.ModuloDisciplina;
 
@@ -9,13 +10,16 @@ namespace TesteFacil.Testes.Integracao.ModuloDisciplina;
 [TestCategory("Testes de Integração de Disciplina")]
 public sealed class RepositorioDisciplinaEmOrmTests
 {
-    private TesteFacilDbContext dbContext;
+    private TesteFacilDbContext? dbContext;
     private RepositorioDisciplinaEmOrm repositorioDisciplina;
 
     [TestInitialize]
     public void ConfigurarTestes()
     {
-        dbContext = TesteDbContextFactory.CriarDbContext();
+        dbContext = AssemblyConfig.DbContextFactory?.CriarDbContext();
+
+        if (dbContext is null)
+            throw new ArgumentNullException("DbContextFactory não inicializada");
 
         repositorioDisciplina = new RepositorioDisciplinaEmOrm(dbContext);
     }
@@ -28,7 +32,7 @@ public sealed class RepositorioDisciplinaEmOrmTests
 
         // Act
         repositorioDisciplina.Cadastrar(disciplina);
-        dbContext.SaveChanges();
+        dbContext?.SaveChanges();
 
         // Assert
         var registroSelecionado = repositorioDisciplina.SelecionarRegistroPorId(disciplina.Id);
@@ -42,13 +46,13 @@ public sealed class RepositorioDisciplinaEmOrmTests
         // Arrange
         var disciplina = new Disciplina("Matemática");
         repositorioDisciplina.Cadastrar(disciplina);
-        dbContext.SaveChanges();
+        dbContext?.SaveChanges();
 
         var disciplinaEditada = new Disciplina("Física");
 
         // Act
         var conseguiuEditar = repositorioDisciplina.Editar(disciplina.Id, disciplinaEditada);
-        dbContext.SaveChanges();
+        dbContext?.SaveChanges();
 
         // Assert
         var registroSelecionado = repositorioDisciplina.SelecionarRegistroPorId(disciplina.Id);
@@ -63,11 +67,11 @@ public sealed class RepositorioDisciplinaEmOrmTests
         // Arrange
         var disciplina = new Disciplina("Matemática");
         repositorioDisciplina.Cadastrar(disciplina);
-        dbContext.SaveChanges();
+        dbContext?.SaveChanges();
 
         // Act
         var conseguiuExcluir = repositorioDisciplina.Excluir(disciplina.Id);
-        dbContext.SaveChanges();
+        dbContext?.SaveChanges();
 
         // Assert
         var registroSelecionado = repositorioDisciplina.SelecionarRegistroPorId(disciplina.Id);
@@ -88,7 +92,7 @@ public sealed class RepositorioDisciplinaEmOrmTests
         repositorioDisciplina.Cadastrar(disciplina2);
         repositorioDisciplina.Cadastrar(disciplina3);
 
-        dbContext.SaveChanges();
+        dbContext?.SaveChanges();
 
         List<Disciplina> disciplinasEsperadas = [disciplina, disciplina2, disciplina3];
 

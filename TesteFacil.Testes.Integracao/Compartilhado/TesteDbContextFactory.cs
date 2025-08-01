@@ -1,16 +1,36 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Testcontainers.MsSql;
 using TesteFacil.Infraestrutura.Orm.Compartilhado;
 
 namespace TesteFacil.Testes.Integracao.Compartilhado;
 
-public static class TesteDbContextFactory
+public class TesteDbContextFactory
 {
-    public static TesteFacilDbContext CriarDbContext()
-    {
-        var configuracao = CriarConfiguracao();
+    private readonly MsSqlContainer container;
 
-        var connectionString = configuracao["SQL_CONNECTION_STRING"];
+    public TesteDbContextFactory()
+    {
+        container = new MsSqlBuilder()
+            .WithImage("mcr.microsoft.com/mssql/server:2019-latest")
+            .WithName("teste-facil-testdb-container")
+            .WithCleanUp(true)
+            .Build();
+    }
+
+    public async Task InicializarAsync()
+    {
+        await container.StartAsync();
+    }
+
+    public async Task EncerrarAsync()
+    {
+        await container.StopAsync();
+        await container.DisposeAsync();
+    }
+
+    public TesteFacilDbContext CriarDbContext()
+    {
+        var connectionString = string.Concat(container.GetConnectionString(), $";Initial Catalog=TesteFacilTestDb");
 
         var options = new DbContextOptionsBuilder<TesteFacilDbContext>()
             .UseSqlServer(connectionString)
@@ -18,18 +38,20 @@ public static class TesteDbContextFactory
 
         var dbContext = new TesteFacilDbContext(options);
 
-        dbContext.Database.EnsureDeleted();
-        dbContext.Database.EnsureCreated();
+        ConfigurarDbContext(dbContext);
 
         return dbContext;
     }
 
-    private static IConfiguration CriarConfiguracao()
+    private static void ConfigurarDbContext(TesteFacilDbContext dbContext)
     {
-        var assembly = typeof(TesteDbContextFactory).Assembly;
+        dbContext.Database.EnsureCreated();
 
-        return new ConfigurationBuilder()
-            .AddUserSecrets(assembly)
-            .Build();
+        dbContext.Testes.RemoveRange(dbContext.Testes);
+        dbContext.Questoes.RemoveRange(dbContext.Questoes);
+        dbContext.Materias.RemoveRange(dbContext.Materias);
+        dbContext.Disciplinas.RemoveRange(dbContext.Disciplinas);
+
+        dbContext.SaveChanges();
     }
 }
