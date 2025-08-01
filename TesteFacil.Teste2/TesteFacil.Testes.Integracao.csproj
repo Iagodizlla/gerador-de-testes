@@ -1,18 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <UserSecretsId>75b9b99d-dea9-4858-a4f3-10be0246547e</UserSecretsId>
+    <UserSecretsId>4db44934-41b7-4f35-977f-4c17909442c9</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.18" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.10.0" />
+    <PackageReference Include="MSTest" Version="3.6.4" />
     <PackageReference Include="NBuilder" Version="6.1.0" />
     <PackageReference Include="Testcontainers.MsSql" Version="4.6.0" />
   </ItemGroup>
@@ -20,6 +20,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Gerador-de-testes.Infraestrutura.Orm\TesteFacil.Infraestrutura.csproj" />
     <ProjectReference Include="..\Gerador-de-testes\TesteFacil.Dominio.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
 
 </Project>
