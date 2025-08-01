@@ -3,12 +3,17 @@
 @{
     Layout = "_Layout";
     var notificacao = ViewData[nameof(NotificacaoViewModel)] as NotificacaoViewModel;
+    var questoesAgrupadas = Model.Registros.GroupBy(q => q.Materia);
 }
 
 <p>
     <a class="btn btn-primary px-4" asp-action="Cadastrar">
         <i class="bi bi-plus"></i>
         Cadastrar Novo/a
+    </a>
+    <a class="btn btn-outline-primary px-4 text-end" asp-action="PrimeiraEtapaGerar">
+        <i class="bi bi-robot"></i>
+        Gerar com IA
     </a>
 </p>
 
@@ -22,13 +27,53 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
+@foreach (var grupo in questoesAgrupadas)
+{
+    <h4 class="text-primary my-4">@grupo.Key</h4>
 
-<div class="row g-1">
+    <div class="row g-3">
+        @foreach (var registro in grupo)
+        {
+            <div class="col-12 col-md-3 d-flex">
+                <div class="card border-0 h-100 w-100 d-flex flex-column">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fs-6">@registro.Enunciado</h5>
+
+                        <p class="card-text mb-0">
+                            <span class="fw-semibold">Resposta Correta:</span> @registro.RespostaCorreta
+                        </p>
+
+                        <p class="card-text mb-0">
+                            <span class="fw-semibold">Matéria:</span> @registro.Materia
+                        </p>
+
+                        <p class="card-text mb-0">
+                            <span class="fw-semibold">Utilizada em teste:</span> @registro.UtilizadaEmTeste
+                        </p>
+
+                        <!-- Botões fixados no fim -->
+                        <div class="mt-auto d-flex gap-1 justify-content-end pt-3">
+                            <a asp-action="Detalhes" asp-route-id="@registro.Id" class="btn btn-secondary rounded-circle card-option" title="Detalhes">
+                                <i class="bi bi-search"></i>
+                            </a>
+                            <a asp-action="Editar" asp-route-id="@registro.Id" class="btn btn-primary rounded-circle card-option" title="Edição">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a asp-action="Excluir" asp-route-id="@registro.Id" class="btn btn-danger rounded-circle card-option" title="Exclusão">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
     @foreach (var registro in Model.Registros)
     {
-        <div class="col-12 col-md-3">
-            <div class="card border-0">
-                <div class="card-body">
+    <div class="col-12 col-md-3 d-flex">
+        <div class="card border-0 h-100 w-100 d-flex flex-column">
+            <div class="card-body d-flex flex-column">
                     <h5 class="card-title">@registro.Enunciado</h5>
 
                     <p class="card-text mb-0">
@@ -43,7 +88,7 @@
                         <span class="fw-semibold">Utilizada em teste:</span> @registro.UtilizadaEmTeste
                     </p>
 
-                    <span class="d-flex gap-1 justify-content-end mt-4">
+                    <div class="d-flex gap-1 justify-content-end mt-4">
                         <a asp-action="Detalhes" asp-route-id="@registro.Id" class="btn btn-secondary rounded-circle card-option" title="Detalhes">
                             <i class="bi bi-search"></i>
                         </a>
@@ -53,9 +98,8 @@
                         <a asp-action="Excluir" asp-route-id="@registro.Id" class="btn btn-danger rounded-circle card-option" title="Exclusão">
                             <i class="bi bi-trash"></i>
                         </a>
-                    </span>
+                    </div>
                 </div>
             </div>
         </div>
     }
-</div>

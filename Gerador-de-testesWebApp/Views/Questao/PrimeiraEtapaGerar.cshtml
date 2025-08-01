@@ -1,0 +1,47 @@
+﻿@model PrimeiraEtapaGerarQuestoesViewModel
+
+@{
+    ViewBag.Titulo = "Geração Automática de Questões";
+}
+
+<hr />
+<div class="row justify-content-center my-5">
+    <div class="col-md-8">
+        <div class="card rounded-4 border-0">
+            <div class="card-body p-md-5">
+                <form asp-action="PrimeiraEtapaGerar" method="post">
+                    <h3 class="mb-4">Geração Automática de Questões</h3>
+
+                    @if (ViewData.ModelState["CadastroUnico"]?.Errors.Count > 0)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+                            @ViewData.ModelState["CadastroUnico"]!.Errors.First().ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <div class="form-group d-grid gap-2 mt-4">
+                        <label asp-for="MateriaId" class="control-label fs-5">Matéria:</label>
+                        <select asp-for="MateriaId" asp-items="Model.MateriasDisponiveis" class="form-select"></select>
+                        <span asp-validation-for="MateriaId" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group d-grid gap-2 mt-3">
+                        <label asp-for="QuantidadeQuestoes" class="control-label fs-5">Quantidade de Questões:</label>
+                        <input asp-for="QuantidadeQuestoes" class="form-control" type="number" />
+                        <span asp-validation-for="QuantidadeQuestoes" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group d-flex align-items-center justify-content-end gap-3 mt-5">
+                        <a asp-action="Index">Voltar para a listagem</a>
+                        <button type="submit" class="btn btn-primary rounded-3 px-5">Gerar Questões</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

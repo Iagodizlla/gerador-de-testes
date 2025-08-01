@@ -37,6 +37,7 @@ public class Program
             builder.Services.AddEntityFrameworkConfig(builder.Configuration);
         }
 
+        builder.Services.AddGeminiChatConfig();
         builder.Services.AddSerilogConfig(builder.Logging);
 
         builder.Services.AddControllersWithViews(options =>

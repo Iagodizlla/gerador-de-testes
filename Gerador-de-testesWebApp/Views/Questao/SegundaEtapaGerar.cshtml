@@ -1,0 +1,80 @@
+﻿@model SegundaEtapaGerarQuestoesViewModel
+
+@{
+   // ViewBag.Titulo = "Geração Automática de Questões";
+}
+
+<hr />
+<div class="row justify-content-center my-5">
+    <div class="col-md-8">
+        <div class="card rounded-4 border-0">
+            <div class="card-body p-md-5">
+                <form asp-action="SegundaEtapaGerar" method="post">
+                    <h3 class="mb-4">Geração Automática de Questões</h3>
+
+                    @if (ViewData.ModelState["CadastroUnico"]?.Errors.Count > 0)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show my-3" role="alert">
+                            @ViewData.ModelState["CadastroUnico"]!.Errors.First().ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <div class="form-group d-grid gap-2 mt-3">
+                        <label asp-for="MateriaId" class="control-label fs-5">Matéria:</label>
+                        <input asp-for="MateriaId" class="form-control" type="hidden" />
+                        <input asp-for="Materia" class="form-control" disabled readonly />
+                    </div>
+
+                    @* Reenvia questões e alternativas geradas*@
+                    @for (int i = 0; i < Model.QuestoesGeradas.Count; i++)
+                    {
+                        <input type="hidden" asp-for="QuestoesGeradas[@i].Enunciado" />
+
+                        @for (int j = 0; j < Model.QuestoesGeradas[i].AlternativasGeradas.Count; j++)
+                        {
+                            <input type="hidden" asp-for="QuestoesGeradas[@i].AlternativasGeradas[@j].Resposta" />
+                            <input type="hidden" asp-for="QuestoesGeradas[@i].AlternativasGeradas[@j].Correta" />
+                        }
+                    }
+
+                    @if (Model.QuestoesGeradas.Count > 0)
+                    {
+                        <label for="QuestoesGeradas" class="control-label fs-5 mt-4">Questões:</label>
+
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Enunciado</th>
+                                    <th>Resposta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var q in Model.QuestoesGeradas)
+                                {
+                                    <tr>
+                                        <td valign="middle">
+                                            @q.Enunciado
+                                        </td>
+                                        <td valign="middle" style="max-width: 150px;">
+                                            @q.AlternativasGeradas.Find(a => a.Correta)?.Resposta
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+
+                    <div class="form-group d-flex align-items-center justify-content-end gap-3 mt-5">
+                        <a asp-action="Index">Voltar para a listagem</a>
+                        <button type="submit" class="btn btn-primary rounded-3 px-5">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
