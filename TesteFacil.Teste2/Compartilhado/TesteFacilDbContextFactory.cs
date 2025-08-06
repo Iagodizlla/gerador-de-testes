@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Testcontainers.MsSql;
 using TesteFacil.Infraestrutura.Orm.Compartilhado;
 
 namespace TesteFacil.Testes.Integracao.Compartilhado;

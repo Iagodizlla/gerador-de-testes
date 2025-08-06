@@ -2,6 +2,9 @@
 using FizzWare.NBuilder;
 using Testcontainers.MsSql;
 using TesteFacil.Dominio.ModuloDisciplina;
+using TesteFacil.Dominio.ModuloMateria;
+using TesteFacil.Dominio.ModuloQuestao;
+using TesteFacil.Dominio.ModuloTeste;
 using TesteFacil.Infraestrutura.Orm.Compartilhado;
 using TesteFacil.Infraestrutura.Orm.ModuloDisciplina;
 using TesteFacil.Infraestrutura.Orm.ModuloMateria;
@@ -55,6 +58,15 @@ public abstract class TestFixture
 
         BuilderSetup.SetCreatePersistenceMethod<Disciplina>(repositorioDisciplina.Cadastrar);
         BuilderSetup.SetCreatePersistenceMethod<IList<Disciplina>>(repositorioDisciplina.CadastrarEntidades);
+
+        BuilderSetup.SetCreatePersistenceMethod<Materia>(repositorioMateria.Cadastrar);
+        BuilderSetup.SetCreatePersistenceMethod<IList<Materia>>(repositorioMateria.CadastrarEntidades);
+
+        BuilderSetup.SetCreatePersistenceMethod<Questao>(repositorioQuestao.Cadastrar);
+        BuilderSetup.SetCreatePersistenceMethod<IList<Questao>>(repositorioQuestao.CadastrarEntidades);
+
+        BuilderSetup.SetCreatePersistenceMethod<Teste>(repositorioTeste.Cadastrar);
+        BuilderSetup.SetCreatePersistenceMethod<IList<Teste>>(repositorioTeste.CadastrarEntidades);
     }
 
     private static void ConfigurarTabelas(TesteFacilDbContext dbContext)

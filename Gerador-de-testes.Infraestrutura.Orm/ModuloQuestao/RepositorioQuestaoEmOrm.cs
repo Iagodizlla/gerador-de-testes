@@ -44,6 +44,7 @@ public class RepositorioQuestaoEmOrm : RepositorioBaseEmOrm<Questao>, IRepositor
     public override List<Questao> SelecionarRegistros()
     {
         return registros
+            .OrderBy(x => x.Enunciado)
             .Include(x => x.Alternativas)
             .Include(x => x.Materia)
             .ToList();
