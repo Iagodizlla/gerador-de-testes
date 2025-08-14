@@ -22,6 +22,13 @@ public class Disciplina : EntidadeBase<Disciplina>
         Id = Guid.NewGuid();
         Nome = nome;
     }
+    public void AdicionarMateria(Materia materia)
+    {
+        if (Materias.Contains(materia))
+            return;
+
+        Materias.Add(materia);
+    }
 
     public List<Questao> ObterQuestoesAleatorias(int quantidadeQuestoes, SerieMateria serie)
     {
