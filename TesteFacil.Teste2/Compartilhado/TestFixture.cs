@@ -1,6 +1,6 @@
 ﻿using DotNet.Testcontainers.Containers;
 using FizzWare.NBuilder;
-using Testcontainers.MsSql;
+using Testcontainers.PostgreSql;
 using TesteFacil.Dominio.ModuloDisciplina;
 using TesteFacil.Dominio.ModuloMateria;
 using TesteFacil.Dominio.ModuloQuestao;
@@ -26,11 +26,14 @@ public abstract class TestFixture
     [AssemblyInitialize]
     public static async Task Setup(TestContext _)
     {
-        container = new MsSqlBuilder()
-           .WithImage("mcr.microsoft.com/mssql/server:2019-latest")
-           .WithName("teste-facil-testdb-container")
-           .WithCleanUp(true)
-           .Build();
+        container = new PostgreSqlBuilder()
+            .WithImage("postgres:16")
+            .WithName("teste-facil-testdb")
+            .WithDatabase("AcademiaDoProgramadorDb")
+            .WithUsername("postgres")
+            .WithPassword("YourStrongPassword")
+            .WithCleanUp(true)
+            .Build();
 
         await InicializarBancoDadosAsync(container);
     }

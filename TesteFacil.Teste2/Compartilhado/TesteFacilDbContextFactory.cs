@@ -9,7 +9,7 @@ public static class TesteFacilDbContextFactory
     {
 
         var options = new DbContextOptionsBuilder<TesteFacilDbContext>()
-            .UseSqlServer(connectionString)
+            .UseNpgsql(connectionString)
             .Options;
 
         var dbContext = new TesteFacilDbContext(options);
