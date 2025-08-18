@@ -24,6 +24,8 @@
   <img src="https://skillicons.dev/icons?i=github" height="50"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" height="45"/>
   <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/render.svg" height="40"/>
+  <img src="https://skillicons.dev/icons?i=azure" height="50"/>
+  <img src="https://skillicons.dev/icons?i=docker" height="50"/>
 </p>
 
 ---
