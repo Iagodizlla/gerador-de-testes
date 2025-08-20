@@ -52,9 +52,32 @@ jobs:
       - name: Run tests
         run: dotnet test --configuration Release --verbosity normal
 
-  deploy:
+  migrate:
     runs-on: windows-latest
     needs: [build, test]
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - name: Install EF Core CLI
+        run: dotnet tool install --global dotnet-ef
+  
+      - name: Apply EF Core migrations
+        run: dotnet ef database update --project ./TesteFacil.Infraestrutura.Orm --startup-project ./TesteFacil.WebApp
+        env:
+          SQL_CONNECTION_STRING: ${{ secrets.SQL_CONNECTION_STRING }}
+
+  deploy:
+    runs-on: windows-latest
+    needs: [build, test, migrate]
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
