@@ -71,7 +71,7 @@ jobs:
         run: dotnet tool install --global dotnet-ef
   
       - name: Apply EF Core migrations
-        run: dotnet ef database update --project ./TesteFacil.Infraestrutura.Orm --startup-project ./TesteFacil.WebApp
+        run: dotnet ef database update --project ./Gerador-de-testes.Infraestrutura.Orm --startup-project ./Gerador-de-testesWebApp
         env:
           SQL_CONNECTION_STRING: ${{ secrets.SQL_CONNECTION_STRING }}
 
